@@ -1,0 +1,203 @@
+{
+  "$defs": {
+    "MetricSpec": {
+      "properties": {
+        "condition": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Condition"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "MetricSpec",
+      "type": "object"
+    },
+    "PlanInput": {
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "data_nature": {
+          "enum": [
+            "empirical",
+            "synthetic",
+            "simulated"
+          ],
+          "title": "Data Nature",
+          "type": "string"
+        },
+        "path": {
+          "description": "where the file appears in the sandbox workspace, e.g. data/train.csv",
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "path",
+        "data_nature"
+      ],
+      "title": "PlanInput",
+      "type": "object"
+    },
+    "PlanLimits": {
+      "properties": {
+        "cpus": {
+          "default": 1.0,
+          "exclusiveMinimum": 0,
+          "title": "Cpus",
+          "type": "number"
+        },
+        "memory_mb": {
+          "default": 1024,
+          "minimum": 128,
+          "title": "Memory Mb",
+          "type": "integer"
+        },
+        "timeout_s": {
+          "default": 600,
+          "minimum": 10,
+          "title": "Timeout S",
+          "type": "integer"
+        }
+      },
+      "title": "PlanLimits",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "code_artifact_id": {
+      "title": "Code Artifact Id",
+      "type": "string"
+    },
+    "code_path": {
+      "default": "main.py",
+      "description": "script path inside the workspace (zip archives are unpacked)",
+      "title": "Code Path",
+      "type": "string"
+    },
+    "data_origin": {
+      "minLength": 3,
+      "title": "Data Origin",
+      "type": "string"
+    },
+    "data_rights": {
+      "minLength": 3,
+      "title": "Data Rights",
+      "type": "string"
+    },
+    "entrypoint": {
+      "description": "argv, e.g. ['python', 'main.py', '--seed', '{seed}']",
+      "items": {
+        "type": "string"
+      },
+      "title": "Entrypoint",
+      "type": "array"
+    },
+    "image": {
+      "description": "allowlisted image key, e.g. python-sci:1",
+      "title": "Image",
+      "type": "string"
+    },
+    "inputs": {
+      "items": {
+        "$ref": "#/$defs/PlanInput"
+      },
+      "title": "Inputs",
+      "type": "array"
+    },
+    "limitations": {
+      "minLength": 3,
+      "title": "Limitations",
+      "type": "string"
+    },
+    "limits": {
+      "$ref": "#/$defs/PlanLimits"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/MetricSpec"
+      },
+      "minItems": 1,
+      "title": "Metrics",
+      "type": "array"
+    },
+    "metrics_path": {
+      "default": "out/metrics.json",
+      "title": "Metrics Path",
+      "type": "string"
+    },
+    "predictions_path": {
+      "default": "out/predictions.csv",
+      "title": "Predictions Path",
+      "type": "string"
+    },
+    "run_type": {
+      "enum": [
+        "exploratory",
+        "confirmatory"
+      ],
+      "title": "Run Type",
+      "type": "string"
+    },
+    "sample_size": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sample Size"
+    },
+    "seed": {
+      "maximum": 2147483647,
+      "minimum": 0,
+      "title": "Seed",
+      "type": "integer"
+    },
+    "title": {
+      "maxLength": 300,
+      "minLength": 3,
+      "title": "Title",
+      "type": "string"
+    },
+    "tolerance": {
+      "default": 1e-09,
+      "description": "absolute tolerance for rerun agreement",
+      "minimum": 0,
+      "title": "Tolerance",
+      "type": "number"
+    }
+  },
+  "required": [
+    "title",
+    "code_artifact_id",
+    "entrypoint",
+    "image",
+    "seed",
+    "run_type",
+    "metrics",
+    "data_origin",
+    "data_rights",
+    "limitations"
+  ],
+  "title": "ExperimentPlanIn",
+  "type": "object"
+}

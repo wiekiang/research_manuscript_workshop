@@ -1,0 +1,101 @@
+{
+  "contracts_version": "1.0.0",
+  "transitions": [
+    {
+      "from": "CREATED",
+      "to": "TARGET_REVIEW",
+      "gates": [
+        "target.selected"
+      ],
+      "description": "An official (or exploratory) target is selected"
+    },
+    {
+      "from": "TARGET_REVIEW",
+      "to": "DIRECTION_REVIEW",
+      "gates": [
+        "cfp.confirmed"
+      ],
+      "description": "Official CFP snapshot exists, track selected and every blocking rule confirmed by a human"
+    },
+    {
+      "from": "DIRECTION_REVIEW",
+      "to": "PROTOCOL_REVIEW",
+      "gates": [
+        "h1.approved"
+      ],
+      "description": "H1 research direction approved"
+    },
+    {
+      "from": "PROTOCOL_REVIEW",
+      "to": "RESEARCH_ACTIVE",
+      "gates": [
+        "h2.approved"
+      ],
+      "description": "H2 frozen protocol approved"
+    },
+    {
+      "from": "RESEARCH_ACTIVE",
+      "to": "OUTCOME_REVIEW",
+      "gates": [
+        "method.required_stages_complete"
+      ],
+      "description": "All required method-workflow stages produced committed, validated outputs"
+    },
+    {
+      "from": "OUTCOME_REVIEW",
+      "to": "DRAFTING",
+      "gates": [
+        "h3.approved"
+      ],
+      "description": "H3 outcomes and interpretation approved"
+    },
+    {
+      "from": "DRAFTING",
+      "to": "SCIENTIFIC_REVIEW",
+      "gates": [
+        "manuscript.complete"
+      ],
+      "description": "A committed manuscript version covers all sections"
+    },
+    {
+      "from": "SCIENTIFIC_REVIEW",
+      "to": "COMPLIANCE_REVIEW",
+      "gates": [
+        "review.passed"
+      ],
+      "description": "Independent review functions frozen, meta-review complete, no open blocker/major findings"
+    },
+    {
+      "from": "COMPLIANCE_REVIEW",
+      "to": "FINAL_APPROVAL",
+      "gates": [
+        "compliance.checked",
+        "integrity.checked",
+        "readiness.pre_approval"
+      ],
+      "description": "Compile, compliance and integrity checks done; pre-approval readiness assessment recorded"
+    },
+    {
+      "from": "FINAL_APPROVAL",
+      "to": "APPROVED_FOR_EXPORT",
+      "gates": [
+        "h4.approved",
+        "approvals.h1_to_h4_current",
+        "method.enabled_for_submission",
+        "contribution.recorded",
+        "blockers.none"
+      ],
+      "description": "Corresponding author signed the frozen content manifest; all gates current"
+    },
+    {
+      "from": "APPROVED_FOR_EXPORT",
+      "to": "PACKAGE_READY",
+      "gates": [
+        "package.verified",
+        "eligibility.current",
+        "approvals.h1_to_h4_current"
+      ],
+      "description": "Package content hashes match the H4 manifest and submission eligibility is current"
+    }
+  ]
+}

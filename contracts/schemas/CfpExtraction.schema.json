@@ -1,0 +1,407 @@
+{
+  "$defs": {
+    "DeadlineKind": {
+      "enum": [
+        "abstract_registration",
+        "full_paper",
+        "supplementary",
+        "rebuttal",
+        "notification",
+        "camera_ready",
+        "author_registration",
+        "artifact",
+        "other"
+      ],
+      "title": "DeadlineKind",
+      "type": "string"
+    },
+    "ExtractedDeadline": {
+      "properties": {
+        "date": {
+          "description": "YYYY-MM-DD exactly as stated",
+          "title": "Date",
+          "type": "string"
+        },
+        "deadline_kind": {
+          "$ref": "#/$defs/DeadlineKind"
+        },
+        "mandatory": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mandatory"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        },
+        "time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "HH:MM 24h if stated, else null",
+          "title": "Time"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "timezone exactly as written (e.g. AoE, UTC-12, PDT), else null",
+          "title": "Timezone"
+        },
+        "track": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Track"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Uncertainty"
+        }
+      },
+      "required": [
+        "deadline_kind",
+        "track",
+        "date",
+        "time",
+        "timezone",
+        "mandatory",
+        "quote",
+        "uncertainty"
+      ],
+      "title": "ExtractedDeadline",
+      "type": "object"
+    },
+    "ExtractedEdition": {
+      "properties": {
+        "acronym": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Acronym"
+        },
+        "conference_name": {
+          "title": "Conference Name",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Location"
+        },
+        "official_site_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Official Site Url"
+        },
+        "publication_outlet": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publication Outlet"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publisher"
+        },
+        "submission_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Submission Url"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Year"
+        }
+      },
+      "required": [
+        "conference_name",
+        "acronym",
+        "year",
+        "location",
+        "submission_url",
+        "publication_outlet",
+        "publisher",
+        "official_site_url"
+      ],
+      "title": "ExtractedEdition",
+      "type": "object"
+    },
+    "ExtractedRule": {
+      "properties": {
+        "blocking": {
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "category": {
+          "$ref": "#/$defs/RuleCategory"
+        },
+        "quote": {
+          "description": "verbatim snippet from the source (at most ~300 characters)",
+          "title": "Quote",
+          "type": "string"
+        },
+        "rule_key": {
+          "description": "dotted key, e.g. length.page_limit or anonymization.mode",
+          "title": "Rule Key",
+          "type": "string"
+        },
+        "track": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "track name the rule applies to, or null for conference-wide",
+          "title": "Track"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Uncertainty"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "machine value when obvious (e.g. 8, double_blind), else null",
+          "title": "Value"
+        },
+        "value_text": {
+          "description": "the rule restated precisely, without adding requirements",
+          "title": "Value Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rule_key",
+        "category",
+        "track",
+        "value_text",
+        "value",
+        "unit",
+        "blocking",
+        "quote",
+        "uncertainty"
+      ],
+      "title": "ExtractedRule",
+      "type": "object"
+    },
+    "ExtractedTrack": {
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "paper_types": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Paper Types",
+          "type": "array"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Quote"
+        },
+        "submission_categories": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Submission Categories",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "paper_types",
+        "submission_categories",
+        "quote"
+      ],
+      "title": "ExtractedTrack",
+      "type": "object"
+    },
+    "RuleCategory": {
+      "enum": [
+        "topics",
+        "paper_types",
+        "length",
+        "abstract",
+        "format",
+        "template",
+        "anonymization",
+        "citation_style",
+        "supplementary",
+        "artifact",
+        "conflicts_of_interest",
+        "ethics",
+        "prior_publication",
+        "dual_submission",
+        "preprint",
+        "ai_policy",
+        "ai_disclosure",
+        "fees",
+        "submission_system",
+        "other"
+      ],
+      "title": "RuleCategory",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "deadlines": {
+      "items": {
+        "$ref": "#/$defs/ExtractedDeadline"
+      },
+      "title": "Deadlines",
+      "type": "array"
+    },
+    "edition": {
+      "$ref": "#/$defs/ExtractedEdition"
+    },
+    "rules": {
+      "items": {
+        "$ref": "#/$defs/ExtractedRule"
+      },
+      "title": "Rules",
+      "type": "array"
+    },
+    "tracks": {
+      "items": {
+        "$ref": "#/$defs/ExtractedTrack"
+      },
+      "title": "Tracks",
+      "type": "array"
+    },
+    "uncertainties": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Uncertainties",
+      "type": "array"
+    }
+  },
+  "required": [
+    "edition",
+    "tracks",
+    "rules",
+    "deadlines",
+    "uncertainties"
+  ],
+  "title": "CfpExtraction",
+  "type": "object"
+}

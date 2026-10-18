@@ -1,0 +1,224 @@
+{
+  "$defs": {
+    "OpportunityProposal": {
+      "properties": {
+        "boundary_conditions": {
+          "title": "Boundary Conditions",
+          "type": "string"
+        },
+        "cfp_alignment": {
+          "title": "Cfp Alignment",
+          "type": "string"
+        },
+        "closest_work_paper_ids": {
+          "description": "ids of provided papers that are the nearest prior work",
+          "items": {
+            "type": "string"
+          },
+          "title": "Closest Work Paper Ids",
+          "type": "array"
+        },
+        "compute_estimate": {
+          "title": "Compute Estimate",
+          "type": "string"
+        },
+        "data_availability": {
+          "title": "Data Availability",
+          "type": "string"
+        },
+        "ethics_constraints": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Ethics Constraints"
+        },
+        "how_it_differs": {
+          "title": "How It Differs",
+          "type": "string"
+        },
+        "novelty_caveat": {
+          "title": "Novelty Caveat",
+          "type": "string"
+        },
+        "potential_contribution": {
+          "title": "Potential Contribution",
+          "type": "string"
+        },
+        "rationale": {
+          "$ref": "#/$defs/RationaleProposal"
+        },
+        "research_question": {
+          "title": "Research Question",
+          "type": "string"
+        },
+        "study_types": {
+          "items": {
+            "$ref": "#/$defs/StudyTypeProposal"
+          },
+          "title": "Study Types",
+          "type": "array"
+        },
+        "threats_to_novelty": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Threats To Novelty",
+          "type": "array"
+        },
+        "time_estimate_weeks_high": {
+          "title": "Time Estimate Weeks High",
+          "type": "integer"
+        },
+        "time_estimate_weeks_low": {
+          "title": "Time Estimate Weeks Low",
+          "type": "integer"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "research_question",
+        "cfp_alignment",
+        "potential_contribution",
+        "closest_work_paper_ids",
+        "how_it_differs",
+        "boundary_conditions",
+        "data_availability",
+        "time_estimate_weeks_low",
+        "time_estimate_weeks_high",
+        "compute_estimate",
+        "ethics_constraints",
+        "threats_to_novelty",
+        "novelty_caveat",
+        "study_types",
+        "rationale"
+      ],
+      "title": "OpportunityProposal",
+      "type": "object"
+    },
+    "RationaleProposal": {
+      "properties": {
+        "gap": {
+          "title": "Gap",
+          "type": "string"
+        },
+        "gap_evidence_passage_ids": {
+          "description": "ids of provided evidence passages that show the gap",
+          "items": {
+            "type": "string"
+          },
+          "title": "Gap Evidence Passage Ids",
+          "type": "array"
+        },
+        "importance_to_venue": {
+          "title": "Importance To Venue",
+          "type": "string"
+        },
+        "intended_contribution": {
+          "title": "Intended Contribution",
+          "type": "string"
+        },
+        "problem": {
+          "title": "Problem",
+          "type": "string"
+        },
+        "success_criterion": {
+          "title": "Success Criterion",
+          "type": "string"
+        }
+      },
+      "required": [
+        "problem",
+        "gap",
+        "gap_evidence_passage_ids",
+        "importance_to_venue",
+        "intended_contribution",
+        "success_criterion"
+      ],
+      "title": "RationaleProposal",
+      "type": "object"
+    },
+    "StudyTypeProposal": {
+      "properties": {
+        "blockers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Blockers",
+          "type": "array"
+        },
+        "fit_rationale": {
+          "title": "Fit Rationale",
+          "type": "string"
+        },
+        "reporting_standard": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reporting Standard"
+        },
+        "required_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Inputs",
+          "type": "array"
+        },
+        "study_type": {
+          "title": "Study Type",
+          "type": "string"
+        },
+        "venue_category": {
+          "title": "Venue Category",
+          "type": "string"
+        }
+      },
+      "required": [
+        "study_type",
+        "venue_category",
+        "fit_rationale",
+        "required_inputs",
+        "reporting_standard",
+        "blockers"
+      ],
+      "title": "StudyTypeProposal",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "negative_findings": {
+      "description": "searches or angles that found no gap or found it already addressed",
+      "items": {
+        "type": "string"
+      },
+      "title": "Negative Findings",
+      "type": "array"
+    },
+    "proposals": {
+      "items": {
+        "$ref": "#/$defs/OpportunityProposal"
+      },
+      "title": "Proposals",
+      "type": "array"
+    }
+  },
+  "required": [
+    "proposals",
+    "negative_findings"
+  ],
+  "title": "OpportunitySet",
+  "type": "object"
+}

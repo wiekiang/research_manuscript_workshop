@@ -1,0 +1,91 @@
+{
+  "properties": {
+    "artifact_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Artifact Ids",
+      "type": "array"
+    },
+    "category": {
+      "title": "Category",
+      "type": "string"
+    },
+    "check": {
+      "description": "how to reproduce the check",
+      "title": "Check",
+      "type": "string"
+    },
+    "claim_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Claim Ids",
+      "type": "array"
+    },
+    "function": {
+      "enum": [
+        "scientific",
+        "citation_evidence",
+        "technical",
+        "compliance"
+      ],
+      "title": "Function",
+      "type": "string"
+    },
+    "proposed_fix": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Proposed Fix"
+    },
+    "rationale": {
+      "title": "Rationale",
+      "type": "string"
+    },
+    "rule_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Rule Ids",
+      "type": "array"
+    },
+    "severity": {
+      "enum": [
+        "blocker",
+        "major",
+        "minor",
+        "suggestion"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "span_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Span Ids",
+      "type": "array"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "function",
+    "severity",
+    "category",
+    "title",
+    "rationale",
+    "check"
+  ],
+  "title": "Finding",
+  "type": "object"
+}

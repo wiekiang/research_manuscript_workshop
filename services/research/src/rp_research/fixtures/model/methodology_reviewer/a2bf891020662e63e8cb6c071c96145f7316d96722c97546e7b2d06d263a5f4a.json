@@ -1,0 +1,27 @@
+{
+  "fixture_for": "M5 tests",
+  "output": {
+    "can_answer_question": "partially",
+    "issues": [
+      {
+        "severity": "blocker",
+        "section": "sample_or_data_selection",
+        "issue": "Eight pipelines cannot support a binomial test with meaningful power.",
+        "rationale": "The planned exact test will be uninformative at n=8.",
+        "proposed_fix": "Report the proportion with an interval and frame the study as exploratory, or enlarge the sample."
+      },
+      {
+        "severity": "minor",
+        "section": "operational_definitions",
+        "issue": "Byte-identical may be too strict for timestamps.",
+        "rationale": "Outputs embedding timestamps would never match.",
+        "proposed_fix": "Normalise timestamps before comparing."
+      }
+    ],
+    "threats_to_validity": [
+      "selection bias in the curated list"
+    ],
+    "ethics_flags": [],
+    "cost_flags": []
+  }
+}

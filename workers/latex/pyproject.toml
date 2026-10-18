@@ -1,0 +1,16 @@
+[project]
+name = "rp-latex"
+version = "0.1.0"
+description = "Sandboxed LaTeX template analysis, adaptation, compilation and PDF checks"
+requires-python = ">=3.13"
+dependencies = [
+    "rp-contracts",
+    "pypdf==6.21.1",
+]
+
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rp_latex"]

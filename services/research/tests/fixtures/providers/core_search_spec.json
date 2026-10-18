@@ -1,0 +1,15 @@
+{
+  "_fixture": "Synthetic example shaped exactly by the published CORE API v3 SearchResponse/Work schemas (https://api.core.ac.uk/swagger/v3.json, retrieved 2026-10-18). Not a recorded live response: live field naming must be verified with a real key before the gate is cleared.",
+  "total_hits": 2,
+  "limit": 2,
+  "offset": 0,
+  "search_id": "fixture",
+  "results": [
+    {"id": 1001, "title": "Improving reproducibility of data science pipelines through transparent provenance capture",
+     "authors": ["Lukas Rupprecht", "James C. Davis"], "year_published": 2020, "doi": "10.14778/3415478.3415556",
+     "download_url": "https://core.ac.uk/download/1001.pdf", "abstract": "Fixture abstract.", "publisher": "VLDB Endowment",
+     "document_type": "research"},
+    {"id": 1002, "title": "A fixture record without full text", "authors": ["A. Author"], "year_published": 2019,
+     "doi": null, "download_url": null}
+  ]
+}

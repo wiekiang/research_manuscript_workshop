@@ -1,0 +1,37 @@
+{
+  "properties": {
+    "scope_notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Scope Notes"
+    },
+    "strength_mismatch": {
+      "description": "true if the claim states more (causality, generality, numbers) than the passage",
+      "title": "Strength Mismatch",
+      "type": "boolean"
+    },
+    "uncertainty": {
+      "title": "Uncertainty",
+      "type": "string"
+    },
+    "verdict": {
+      "description": "supports | partially_supports | does_not_support | contradicts | unclear",
+      "title": "Verdict",
+      "type": "string"
+    }
+  },
+  "required": [
+    "verdict",
+    "scope_notes",
+    "strength_mismatch",
+    "uncertainty"
+  ],
+  "title": "SupportAssessment",
+  "type": "object"
+}

@@ -1,0 +1,41 @@
+{
+  "properties": {
+    "due_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Due At"
+    },
+    "problems": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Problems",
+      "type": "array"
+    },
+    "timezone_label": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Timezone Label"
+    }
+  },
+  "required": [
+    "due_at",
+    "timezone_label",
+    "problems"
+  ],
+  "title": "DeadlineResolution",
+  "type": "object"
+}

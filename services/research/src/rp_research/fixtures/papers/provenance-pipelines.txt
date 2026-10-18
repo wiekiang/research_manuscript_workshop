@@ -1,0 +1,19 @@
+# Improving Reproducibility of Data Science Pipelines (fixture excerpt for automated tests)
+
+FIXTURE NOTICE: this short text is a synthetic excerpt written for automated tests of the evidence pipeline. It paraphrases no real paper and reports no real findings.
+
+# Abstract
+
+Data science pipelines are frequently re-executed with different library versions, which changes their outputs. We describe a provenance capture approach that records library versions and inputs for every pipeline step.
+
+# Method
+
+We instrumented twelve open-source pipelines and recorded the library versions used by each step. Each pipeline was re-executed in a fresh environment.
+
+# Results
+
+In this fixture, eight of the twelve pipelines produced different outputs when re-executed with updated library versions. Recording library versions allowed seven of those eight pipelines to be restored to their original outputs.
+
+# Limitations
+
+The study covered only Python pipelines, and the selection of pipelines was not random.

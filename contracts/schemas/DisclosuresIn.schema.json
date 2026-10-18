@@ -1,0 +1,74 @@
+{
+  "properties": {
+    "ai_policy_interpretation": {
+      "description": "the researcher's reading of what the policy permits and requires",
+      "maxLength": 8000,
+      "minLength": 10,
+      "title": "Ai Policy Interpretation",
+      "type": "string"
+    },
+    "ai_policy_source": {
+      "description": "URL or rule reference of that policy text",
+      "maxLength": 2000,
+      "minLength": 4,
+      "title": "Ai Policy Source",
+      "type": "string"
+    },
+    "ai_policy_text": {
+      "description": "the venue/publisher policy text as published",
+      "maxLength": 20000,
+      "minLength": 10,
+      "title": "Ai Policy Text",
+      "type": "string"
+    },
+    "ai_use": {
+      "description": "what AI tools were used for, in the authors' words",
+      "maxLength": 8000,
+      "minLength": 10,
+      "title": "Ai Use",
+      "type": "string"
+    },
+    "competing_interests": {
+      "maxLength": 8000,
+      "minLength": 2,
+      "title": "Competing Interests",
+      "type": "string"
+    },
+    "data_availability": {
+      "anyOf": [
+        {
+          "maxLength": 8000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Data Availability"
+    },
+    "ethics_statement": {
+      "maxLength": 8000,
+      "minLength": 2,
+      "title": "Ethics Statement",
+      "type": "string"
+    },
+    "funding": {
+      "maxLength": 8000,
+      "minLength": 2,
+      "title": "Funding",
+      "type": "string"
+    }
+  },
+  "required": [
+    "competing_interests",
+    "funding",
+    "ethics_statement",
+    "ai_use",
+    "ai_policy_text",
+    "ai_policy_source",
+    "ai_policy_interpretation"
+  ],
+  "title": "DisclosuresIn",
+  "type": "object"
+}

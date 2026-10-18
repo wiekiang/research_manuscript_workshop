@@ -1,0 +1,104 @@
+{
+  "$defs": {
+    "DataClassification": {
+      "enum": [
+        "public",
+        "internal",
+        "restricted"
+      ],
+      "title": "DataClassification",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "classification": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DataClassification"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "expected_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Hash"
+    },
+    "input_manifest_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Input Manifest Hash",
+      "type": "string"
+    },
+    "label": {
+      "anyOf": [
+        {
+          "maxLength": 300,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Label"
+    },
+    "media_type": {
+      "title": "Media Type",
+      "type": "string"
+    },
+    "output_kind": {
+      "title": "Output Kind",
+      "type": "string"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "slot": {
+      "default": "0",
+      "maxLength": 120,
+      "title": "Slot",
+      "type": "string"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    }
+  },
+  "required": [
+    "input_manifest_hash",
+    "output_kind",
+    "media_type"
+  ],
+  "title": "ReservationRequest",
+  "type": "object"
+}

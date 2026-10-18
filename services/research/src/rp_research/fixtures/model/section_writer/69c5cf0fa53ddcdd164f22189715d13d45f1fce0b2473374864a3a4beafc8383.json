@@ -1,0 +1,34 @@
+{
+  "fixture_for": "M6 tests",
+  "output": {
+    "key": "discussion",
+    "heading": "Discussion",
+    "paragraphs": [
+      {
+        "spans": [
+          {
+            "text": "Recorded versions restored most affected R pipelines in this sample.",
+            "kind": "interpretation",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "Our study fills the gap for R pipelines.",
+            "kind": "contribution_statement",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "The pipelines that were not restored may depend on system libraries that version records do not capture.",
+            "kind": "hypothesis",
+            "claim_ids": [],
+            "result_keys": []
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "rationale": "Fixture draft of the Discussion section from the brief.",
+    "open_questions": []
+  }
+}

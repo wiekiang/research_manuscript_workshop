@@ -1,0 +1,25 @@
+{
+  "fixture_for": "M7 tests",
+  "output": {
+    "spans": [
+      {
+        "span_id": "S-3e3df22b74",
+        "verdict": "faithful",
+        "rationale": "Within the scope and strength of the passage.",
+        "suggested_wording": null
+      },
+      {
+        "span_id": "S-6f8b6dcd3d",
+        "verdict": "faithful",
+        "rationale": "Within the scope and strength of the passage.",
+        "suggested_wording": null
+      },
+      {
+        "span_id": "S-fe08ff6549",
+        "verdict": "faithful",
+        "rationale": "Within the scope and strength of the passage.",
+        "suggested_wording": null
+      }
+    ]
+  }
+}

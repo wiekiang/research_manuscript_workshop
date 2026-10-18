@@ -1,0 +1,24 @@
+{
+  "fixture_for": "M7 tests",
+  "output": {
+    "question": "The research question is specific and scoped to R pipelines after H1.",
+    "protocol": "The frozen protocol was followed; the exploratory framing matches the methodology review.",
+    "evidence": "One literature claim and one independently checked result support the factual sentences.",
+    "contribution": "The contribution is reported as partial, consistent with the gap assessment.",
+    "conclusions": "Mostly within the evidence; one conclusion sentence generalises beyond the sample.",
+    "findings": [
+      {
+        "severity": "major",
+        "category": "conclusions",
+        "issue": "The conclusion generalises from eight R pipelines",
+        "rationale": "The conclusion states that version records help restore R pipeline outputs in general, while the evidence is an exploratory sample of eight public pipelines.",
+        "check": "Compare the conclusion sentence with the sample size in the Method and the H3 limitations.",
+        "proposed_fix": "Qualify the sentence: 'In this exploratory sample of eight R pipelines, ...'.",
+        "span_ids": [
+          "S-559ceb2c4a"
+        ],
+        "claim_ids": []
+      }
+    ]
+  }
+}

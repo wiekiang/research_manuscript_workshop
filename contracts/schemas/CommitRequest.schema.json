@@ -1,0 +1,50 @@
+{
+  "properties": {
+    "content_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Content Hash",
+      "type": "string"
+    },
+    "dependency_kind": {
+      "default": "derived_from",
+      "title": "Dependency Kind",
+      "type": "string"
+    },
+    "depends_on": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Depends On",
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    },
+    "size_bytes": {
+      "minimum": 0,
+      "title": "Size Bytes",
+      "type": "integer"
+    },
+    "validator_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Validator Version"
+    }
+  },
+  "required": [
+    "content_hash",
+    "size_bytes"
+  ],
+  "title": "CommitRequest",
+  "type": "object"
+}

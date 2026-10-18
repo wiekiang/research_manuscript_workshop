@@ -1,0 +1,45 @@
+# Continuous integration: lint + all backend suites (with Postgres, SeaweedFS, Temporal and the two sandbox images)
+# and the web unit tests/build. Versions are pinned; images by digest in infra/images.lock.
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.5"
+      - name: Start infrastructure
+        run: docker compose -f infra/compose.yaml up -d --wait
+      - name: Build sandbox images
+        run: |
+          docker build -t rp-latex-sandbox:1 infra/sandbox/latex
+          docker build -t rp-experiment-sandbox:1 infra/sandbox/experiment
+          echo "RP_EXPERIMENT_IMAGES={\"python-sci:1\": \"$(docker image inspect rp-experiment-sandbox:1 --format '{{.Id}}')\"}" >> "$GITHUB_ENV"
+      - name: Sync
+        run: uv sync --frozen
+      - name: Migrate test database
+        run: cd apps/api && uv run alembic upgrade head
+      - name: Lint and test
+        run: scripts/test_all.sh
+  web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: npm ci --legacy-peer-deps
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

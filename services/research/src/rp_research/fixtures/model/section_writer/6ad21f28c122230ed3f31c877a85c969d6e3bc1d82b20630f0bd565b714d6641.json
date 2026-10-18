@@ -1,0 +1,34 @@
+{
+  "fixture_for": "M6 tests",
+  "output": {
+    "key": "method",
+    "heading": "Method",
+    "paragraphs": [
+      {
+        "spans": [
+          {
+            "text": "We selected eight public R pipelines with public inputs and no credentials.",
+            "kind": "method",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "Each pipeline was re-executed with and without its recorded library versions, and its outputs were labelled as restored or not.",
+            "kind": "method",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "A restoration classifier was evaluated against these labels following the frozen protocol.",
+            "kind": "method",
+            "claim_ids": [],
+            "result_keys": []
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "rationale": "Fixture draft of the Method section from the brief.",
+    "open_questions": []
+  }
+}

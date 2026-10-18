@@ -1,0 +1,100 @@
+{
+  "fixture_for": "M4 tests",
+  "output": {
+    "proposals": [
+      {
+        "title": "Version drift across non-Python pipelines",
+        "research_question": "Does recording library versions restore outputs for R and Julia data pipelines as it does for Python?",
+        "cfp_alignment": "Reproducibility of data-intensive experiments (CFP topic).",
+        "potential_contribution": "Evidence on whether version recording generalises beyond Python.",
+        "closest_work_paper_ids": [
+          "not-a-provided-id"
+        ],
+        "how_it_differs": "Different language ecosystems.",
+        "boundary_conditions": "Open-source pipelines with public inputs.",
+        "data_availability": "Public repositories.",
+        "time_estimate_weeks_low": 6,
+        "time_estimate_weeks_high": 10,
+        "compute_estimate": "a few CPU-days",
+        "ethics_constraints": null,
+        "threats_to_novelty": [
+          "unpublished replications may exist"
+        ],
+        "novelty_caveat": "Novelty is a hypothesis based on the documented search only.",
+        "study_types": [
+          {
+            "study_type": "empirical_quantitative",
+            "venue_category": "full_paper",
+            "fit_rationale": "Measured re-execution outcomes.",
+            "required_inputs": [
+              "pipeline corpus"
+            ],
+            "reporting_standard": null,
+            "blockers": []
+          },
+          {
+            "study_type": "systematic_review",
+            "venue_category": "full_paper",
+            "fit_rationale": "Could survey reproducibility studies.",
+            "required_inputs": [
+              "protocol"
+            ],
+            "reporting_standard": "PRISMA",
+            "blockers": []
+          }
+        ],
+        "rationale": {
+          "problem": "Pipelines change outputs when dependencies change.",
+          "gap": "Evidence is limited to Python pipelines.",
+          "gap_evidence_passage_ids": [
+            "fabricated-passage"
+          ],
+          "importance_to_venue": "Directly matches the reproducibility topic.",
+          "intended_contribution": "Cross-ecosystem measurement.",
+          "success_criterion": "Restoration rate measured for at least two ecosystems."
+        }
+      },
+      {
+        "title": "Provenance granularity trade-offs",
+        "research_question": "Which provenance granularity is sufficient to restore pipeline outputs at acceptable capture cost?",
+        "cfp_alignment": "Provenance capture and lineage systems (CFP topic).",
+        "potential_contribution": "A cost/benefit characterisation of provenance granularity.",
+        "closest_work_paper_ids": [],
+        "how_it_differs": "Focus on granularity rather than presence.",
+        "boundary_conditions": "Batch pipelines.",
+        "data_availability": "Public pipelines.",
+        "time_estimate_weeks_low": 8,
+        "time_estimate_weeks_high": 14,
+        "compute_estimate": "moderate",
+        "ethics_constraints": null,
+        "threats_to_novelty": [
+          "workflow-system literature may cover this"
+        ],
+        "novelty_caveat": "Requires a closer search of workflow-system venues.",
+        "study_types": [
+          {
+            "study_type": "methodological",
+            "venue_category": "full_paper",
+            "fit_rationale": "Proposes and evaluates capture strategies.",
+            "required_inputs": [
+              "benchmark"
+            ],
+            "reporting_standard": null,
+            "blockers": []
+          }
+        ],
+        "rationale": {
+          "problem": "Capturing all provenance is costly.",
+          "gap": "Granularity needs are unknown.",
+          "gap_evidence_passage_ids": [],
+          "importance_to_venue": "Lineage systems topic.",
+          "intended_contribution": "Guidance on granularity.",
+          "success_criterion": "Measured trade-off curve."
+        }
+      }
+    ],
+    "negative_findings": [
+      "Version recording for Python pipelines is already studied."
+    ]
+  }
+}

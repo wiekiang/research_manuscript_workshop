@@ -1,0 +1,59 @@
+[project]
+name = "research-platform"
+version = "0.1.0"
+description = "Autonomous AI Research and Manuscript Generation Platform (monorepo root)"
+requires-python = ">=3.13"
+dependencies = [
+    "rp-contracts",
+    "rp-api",
+    "rp-research",
+    "rp-latex",
+    "rp-experiment",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["contracts", "apps/api", "services/research", "workers/latex", "workers/experiment"]
+
+[tool.uv.sources]
+rp-contracts = { workspace = true }
+rp-api = { workspace = true }
+rp-research = { workspace = true }
+rp-latex = { workspace = true }
+rp-experiment = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "pytest-timeout==2.4.0",
+    "ruff==0.17.1",
+    "respx==0.23.1",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "ASYNC"]
+ignore = ["S101", "S311", "B008", "E501", "S608", "S603", "S607", "S105", "S106"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S", "B", "ASYNC109", "ASYNC110"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+timeout = 300
+markers = [
+    "docker: requires a running Docker daemon (sandbox tests)",
+    "temporal: requires the Temporal test server",
+    "network: performs live calls to external public services",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["rp_contracts", "rp_api", "rp_research", "rp_latex", "rp_experiment"]

@@ -1,0 +1,101 @@
+{
+  "properties": {
+    "affiliations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Affiliations",
+      "type": "array"
+    },
+    "competing_interests": {
+      "description": "'None declared' if none",
+      "maxLength": 4000,
+      "minLength": 2,
+      "title": "Competing Interests",
+      "type": "string"
+    },
+    "contribution_roles": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Contribution Roles",
+      "type": "array"
+    },
+    "contribution_statement": {
+      "maxLength": 4000,
+      "minLength": 10,
+      "title": "Contribution Statement",
+      "type": "string"
+    },
+    "corresponding": {
+      "default": false,
+      "title": "Corresponding",
+      "type": "boolean"
+    },
+    "email": {
+      "anyOf": [
+        {
+          "maxLength": 320,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Email"
+    },
+    "funding": {
+      "description": "'No external funding' if none",
+      "maxLength": 4000,
+      "minLength": 2,
+      "title": "Funding",
+      "type": "string"
+    },
+    "human_confirmed": {
+      "description": "the entry describes a natural person (AI tools cannot be authors)",
+      "title": "Human Confirmed",
+      "type": "boolean"
+    },
+    "name": {
+      "maxLength": 300,
+      "minLength": 2,
+      "title": "Name",
+      "type": "string"
+    },
+    "orcid": {
+      "anyOf": [
+        {
+          "pattern": "^\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dX]$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Orcid"
+    },
+    "user_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "User Id"
+    }
+  },
+  "required": [
+    "name",
+    "contribution_statement",
+    "competing_interests",
+    "funding",
+    "human_confirmed"
+  ],
+  "title": "AuthorIn",
+  "type": "object"
+}

@@ -1,0 +1,69 @@
+{
+  "properties": {
+    "action": {
+      "title": "Action",
+      "type": "string"
+    },
+    "context": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Context",
+      "type": "array"
+    },
+    "evaluated_at": {
+      "format": "date-time",
+      "title": "Evaluated At",
+      "type": "string"
+    },
+    "evaluator": {
+      "default": "rp-deadline-evaluator/1",
+      "title": "Evaluator",
+      "type": "string"
+    },
+    "governing": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Governing",
+      "type": "array"
+    },
+    "pending_prerequisites": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Pending Prerequisites",
+      "type": "array"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "eligible",
+        "ineligible",
+        "needs_human_resolution"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "action",
+    "status",
+    "evaluated_at",
+    "governing",
+    "context",
+    "pending_prerequisites",
+    "reasons"
+  ],
+  "title": "EligibilityResult",
+  "type": "object"
+}

@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "DraftParagraph": {
+      "properties": {
+        "spans": {
+          "items": {
+            "$ref": "#/$defs/DraftSpan"
+          },
+          "title": "Spans",
+          "type": "array"
+        }
+      },
+      "required": [
+        "spans"
+      ],
+      "title": "DraftParagraph",
+      "type": "object"
+    },
+    "DraftSpan": {
+      "properties": {
+        "claim_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Claim Ids",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "prior_work",
+            "observed_result",
+            "method",
+            "interpretation",
+            "hypothesis",
+            "limitation",
+            "contribution_statement",
+            "framing"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "result_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Result Keys",
+          "type": "array"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "kind",
+        "claim_ids",
+        "result_keys"
+      ],
+      "title": "DraftSpan",
+      "type": "object"
+    },
+    "SectionDraft": {
+      "properties": {
+        "heading": {
+          "title": "Heading",
+          "type": "string"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "open_questions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Open Questions",
+          "type": "array"
+        },
+        "paragraphs": {
+          "items": {
+            "$ref": "#/$defs/DraftParagraph"
+          },
+          "title": "Paragraphs",
+          "type": "array"
+        },
+        "rationale": {
+          "description": "what this draft does and why (shown with the diff)",
+          "title": "Rationale",
+          "type": "string"
+        },
+        "tables": {
+          "items": {
+            "$ref": "#/$defs/TableRef"
+          },
+          "title": "Tables",
+          "type": "array"
+        }
+      },
+      "required": [
+        "key",
+        "heading",
+        "paragraphs",
+        "tables",
+        "rationale",
+        "open_questions"
+      ],
+      "title": "SectionDraft",
+      "type": "object"
+    },
+    "TableRef": {
+      "properties": {
+        "caption": {
+          "title": "Caption",
+          "type": "string"
+        },
+        "result_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Result Keys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "caption",
+        "result_keys"
+      ],
+      "title": "TableRef",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/SectionDraft"
+      },
+      "title": "Sections",
+      "type": "array"
+    }
+  },
+  "required": [
+    "sections"
+  ],
+  "title": "WriterOutput",
+  "type": "object"
+}

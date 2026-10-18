@@ -1,0 +1,60 @@
+{
+  "$defs": {
+    "SpanMeaning": {
+      "properties": {
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "span_id": {
+          "title": "Span Id",
+          "type": "string"
+        },
+        "suggested_wording": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Suggested Wording"
+        },
+        "verdict": {
+          "enum": [
+            "faithful",
+            "scope_drift",
+            "strength_overstated",
+            "unsupported",
+            "contradicted"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "span_id",
+        "verdict",
+        "rationale",
+        "suggested_wording"
+      ],
+      "title": "SpanMeaning",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "spans": {
+      "items": {
+        "$ref": "#/$defs/SpanMeaning"
+      },
+      "title": "Spans",
+      "type": "array"
+    }
+  },
+  "required": [
+    "spans"
+  ],
+  "title": "MeaningCheckOutput",
+  "type": "object"
+}

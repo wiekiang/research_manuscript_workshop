@@ -1,0 +1,9 @@
+{
+  "fixture_for": "M4 tests",
+  "output": {
+    "verdict": "supports",
+    "scope_notes": "Limited to the twelve fixture pipelines.",
+    "strength_mismatch": false,
+    "uncertainty": "Single small non-random sample."
+  }
+}

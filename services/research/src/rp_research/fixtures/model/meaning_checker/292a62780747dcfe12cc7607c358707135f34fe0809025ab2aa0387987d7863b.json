@@ -1,0 +1,25 @@
+{
+  "fixture_for": "M7 tests",
+  "output": {
+    "spans": [
+      {
+        "span_id": "S-3e3df22b74",
+        "verdict": "faithful",
+        "rationale": "Same scope and strength as the passage.",
+        "suggested_wording": null
+      },
+      {
+        "span_id": "S-6f8b6dcd3d",
+        "verdict": "faithful",
+        "rationale": "Attributes the finding to prior work.",
+        "suggested_wording": null
+      },
+      {
+        "span_id": "S-b3b22ce54a",
+        "verdict": "scope_drift",
+        "rationale": "The passage reports one study of eight pipelines; 'Studies ... found' implies several studies.",
+        "suggested_wording": "One study of eight Python pipelines found that recording library versions restored seven of them."
+      }
+    ]
+  }
+}

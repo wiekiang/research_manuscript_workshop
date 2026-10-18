@@ -1,0 +1,52 @@
+{
+  "fixture_for": "M6 tests",
+  "output": {
+    "key": "abstract",
+    "heading": "Abstract",
+    "paragraphs": [
+      {
+        "spans": [
+          {
+            "text": "Data pipelines often stop reproducing their outputs when the libraries they depend on change.",
+            "kind": "framing",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "For Python pipelines, recording library versions restored most pipelines whose outputs changed after re-execution.",
+            "kind": "prior_work",
+            "claim_ids": [
+              "CLM-0001"
+            ],
+            "result_keys": []
+          },
+          {
+            "text": "We test whether the same holds for pipelines written in R.",
+            "kind": "framing",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "On eight public R pipelines, a restoration classifier reached 0.75 accuracy (6/8).",
+            "kind": "observed_result",
+            "claim_ids": [
+              "CLM-0002"
+            ],
+            "result_keys": [
+              "RES-001"
+            ]
+          },
+          {
+            "text": "The sample is small and exploratory, so the result partly addresses the gap for R only.",
+            "kind": "limitation",
+            "claim_ids": [],
+            "result_keys": []
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "rationale": "Fixture draft of the Abstract section from the brief.",
+    "open_questions": []
+  }
+}

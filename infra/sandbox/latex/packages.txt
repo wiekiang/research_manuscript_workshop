@@ -1,0 +1,13 @@
+# Whitelisted TeX Live packages available inside the no-network LaTeX sandbox.
+# Adding a package is an operator change reviewed like code (PRODUCT_SPEC §2.12: only whitelisted fixes).
+# Template classes (acmart, IEEEtran, llncs) are deliberately NOT installed: classes come from the official
+# template archive as protected files.
+float tools zref oberdiek amsmath amsfonts babel babel-english preprint booktabs caption cmap comment
+draftwatermark environ trimspaces etoolbox fancyhdr fancyvrb framed geometry graphics hyperref hyperxmp
+iftex libertine fontaxes mweights ncctools microtype natbib newtx kastrup pbalance psnfss refcount setspace
+textcase titlesec totpages unicode-math xcolor xkeyval xstring inconsolata cite url sttools subfig algorithms
+dblfloatfix ifmtarg l3packages l3kernel ec cm-super lm csquotes logreq biblatex biber latexmk
+upquote xpatch ifoddpage relsize lastpage enumitem multirow threeparttable siunitx
+biblatex-trad aliascnt
+biblatex-software
+xurl

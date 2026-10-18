@@ -1,0 +1,52 @@
+{
+  "fixture_for": "M6 tests",
+  "output": {
+    "key": "introduction",
+    "heading": "Introduction",
+    "paragraphs": [
+      {
+        "spans": [
+          {
+            "text": "Re-executing a data pipeline months later frequently yields different outputs.",
+            "kind": "framing",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "Prior work on Python pipelines reports that recording library versions restored most pipelines whose outputs changed after re-execution.",
+            "kind": "prior_work",
+            "claim_ids": [
+              "CLM-0001"
+            ],
+            "result_keys": []
+          }
+        ]
+      },
+      {
+        "spans": [
+          {
+            "text": "Whether this transfers to R, where package management differs, has not been measured.",
+            "kind": "framing",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "We ask whether recording library versions restores outputs for R pipelines as it does for Python.",
+            "kind": "framing",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "We hypothesise that version records help, but less reliably than for Python.",
+            "kind": "hypothesis",
+            "claim_ids": [],
+            "result_keys": []
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "rationale": "Fixture draft of the Introduction section from the brief.",
+    "open_questions": []
+  }
+}

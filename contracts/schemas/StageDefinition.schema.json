@@ -1,0 +1,66 @@
+{
+  "properties": {
+    "automation": {
+      "default": "manual",
+      "title": "Automation",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "input_artifact_kinds": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Input Artifact Kinds",
+      "type": "array"
+    },
+    "output_artifact_kinds": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Output Artifact Kinds",
+      "type": "array"
+    },
+    "predecessor_stage_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Predecessor Stage Ids",
+      "type": "array"
+    },
+    "retry_policy_id": {
+      "default": "default",
+      "title": "Retry Policy Id",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "validator_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Validator Ids",
+      "type": "array"
+    },
+    "waits_for_human": {
+      "default": false,
+      "title": "Waits For Human",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "description"
+  ],
+  "title": "StageDefinition",
+  "type": "object"
+}

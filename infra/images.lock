@@ -1,0 +1,8 @@
+# Image digests tested with this revision (promote by digest, never by tag).
+postgres        pgvector/pgvector:pg17                pgvector/pgvector@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
+objectstore     chrislusf/seaweedfs:latest            chrislusf/seaweedfs@sha256:4e61d15fd35994cb1e43e1e553dff106794841fd9a99ade2fc8c8bfce4d7872d
+temporal        temporalio/temporal:latest            temporalio/temporal@sha256:ad4c82c97bd12b417d1ea942610dbcd511afb250c4d5ed26c694009533df447e
+latex-base      texlive/texlive:latest-small          texlive/texlive@sha256:956ab3808fc77b0057c0f8b6db5329642b8db7a33492460b9891862b72334f3c
+latex-sandbox   rp-latex-sandbox:1 (local build)      sha256:d3f9c5fdafdb7bc2ef8dc78e1eed125c15680ff663c6c06683f95a9e8503a7ac
+experiment-base python:3.13                           python@sha256:9d72651cf7018c1f6a1dd6fd02bd68286631c33620bc0f37b0675b21aab915d5
+experiment-sandbox rp-experiment-sandbox:1 (local build) sha256:81d4e66c6640c6a0dce663f3094d0578e2d771ab0f186ed4972e9fa09f783cda

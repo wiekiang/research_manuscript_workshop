@@ -1,0 +1,63 @@
+{
+  "$defs": {
+    "ItemCheck": {
+      "properties": {
+        "index": {
+          "title": "Index",
+          "type": "integer"
+        },
+        "issue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Issue"
+        },
+        "kind": {
+          "description": "rule or deadline",
+          "title": "Kind",
+          "type": "string"
+        },
+        "verdict": {
+          "description": "supported | unsupported | unclear",
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "index",
+        "verdict",
+        "issue"
+      ],
+      "title": "ItemCheck",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/ItemCheck"
+      },
+      "title": "Checks",
+      "type": "array"
+    },
+    "missed_items": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Missed Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "checks",
+    "missed_items"
+  ],
+  "title": "CfpValidation",
+  "type": "object"
+}

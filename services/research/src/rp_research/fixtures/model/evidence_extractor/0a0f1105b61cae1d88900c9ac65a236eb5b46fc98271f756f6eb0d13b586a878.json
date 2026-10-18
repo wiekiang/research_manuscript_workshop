@@ -1,0 +1,59 @@
+{
+  "fixture_for": "M4 tests",
+  "output": {
+    "methods": "Instrumented twelve open-source pipelines and re-executed each in a fresh environment.",
+    "population_or_dataset": "twelve open-source Python data science pipelines",
+    "results": "8 of 12 pipelines changed outputs; recording versions restored 7 of those 8.",
+    "limitations": "Python only; non-random selection.",
+    "passages": [
+      {
+        "quote": "In this fixture, eight of the twelve pipelines produced different outputs when re-executed with updated library versions.",
+        "role": "result",
+        "section_hint": "Results",
+        "summary": "Most pipelines changed outputs after updates."
+      },
+      {
+        "quote": "Recording library versions allowed seven of those eight pipelines to be restored to their original outputs.",
+        "role": "result",
+        "section_hint": "Results",
+        "summary": "Version records restored 7 of 8."
+      },
+      {
+        "quote": "The study covered only Python pipelines, and the selection of pipelines was not random.",
+        "role": "limitation",
+        "section_hint": "Limitations",
+        "summary": "Python only, non-random sample."
+      },
+      {
+        "quote": "All pipelines became fully reproducible after applying our tool.",
+        "role": "result",
+        "section_hint": "Results",
+        "summary": "Fabricated overstatement (must be dropped)."
+      }
+    ],
+    "claims": [
+      {
+        "proposition": "Recording library versions restored most pipelines whose outputs changed after re-execution.",
+        "category": "descriptive",
+        "passage_indices": [
+          1
+        ],
+        "population_or_dataset": "twelve Python pipelines",
+        "measure": "restored outputs",
+        "comparison": null,
+        "scope": "fixture study"
+      },
+      {
+        "proposition": "All pipelines became fully reproducible.",
+        "category": "causal",
+        "passage_indices": [
+          3
+        ],
+        "population_or_dataset": null,
+        "measure": null,
+        "comparison": null,
+        "scope": null
+      }
+    ]
+  }
+}

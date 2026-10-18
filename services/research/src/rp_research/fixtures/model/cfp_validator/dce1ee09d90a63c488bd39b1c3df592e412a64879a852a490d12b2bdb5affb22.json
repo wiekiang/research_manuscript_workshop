@@ -1,0 +1,128 @@
+{
+  "fixture_for": "icrds2027.html",
+  "output": {
+    "checks": [
+      {
+        "kind": "rule",
+        "index": 0,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 1,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 2,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 3,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 4,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 5,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 6,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 7,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 8,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 9,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 10,
+        "verdict": "unclear",
+        "issue": "Where to disclose depends on a publisher policy that the CFP does not quote."
+      },
+      {
+        "kind": "rule",
+        "index": 11,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 12,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "rule",
+        "index": 13,
+        "verdict": "unsupported",
+        "issue": "The source does not mention a registration fee."
+      },
+      {
+        "kind": "deadline",
+        "index": 0,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "deadline",
+        "index": 1,
+        "verdict": "unsupported",
+        "issue": "The source states January 21, 2027, not January 22."
+      },
+      {
+        "kind": "deadline",
+        "index": 2,
+        "verdict": "unclear",
+        "issue": "No timezone is stated for this date."
+      },
+      {
+        "kind": "deadline",
+        "index": 3,
+        "verdict": "unclear",
+        "issue": "No timezone is stated for this date."
+      },
+      {
+        "kind": "deadline",
+        "index": 4,
+        "verdict": "supported",
+        "issue": null
+      },
+      {
+        "kind": "deadline",
+        "index": 5,
+        "verdict": "unclear",
+        "issue": "No timezone is stated for this date."
+      }
+    ],
+    "missed_items": []
+  }
+}

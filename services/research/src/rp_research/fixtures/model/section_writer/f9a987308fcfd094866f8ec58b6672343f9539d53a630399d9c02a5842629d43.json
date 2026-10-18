@@ -1,0 +1,28 @@
+{
+  "fixture_for": "M6 tests",
+  "output": {
+    "key": "conclusion",
+    "heading": "Conclusion",
+    "paragraphs": [
+      {
+        "spans": [
+          {
+            "text": "Recording library versions appears to help restore R pipeline outputs, as reported for Python.",
+            "kind": "interpretation",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "Larger samples and other ecosystems are needed before generalising.",
+            "kind": "limitation",
+            "claim_ids": [],
+            "result_keys": []
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "rationale": "Fixture draft of the Conclusion section from the brief.",
+    "open_questions": []
+  }
+}

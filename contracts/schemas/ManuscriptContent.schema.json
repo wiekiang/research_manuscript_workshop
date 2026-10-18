@@ -1,0 +1,213 @@
+{
+  "$defs": {
+    "FigureRef": {
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "caption": {
+          "title": "Caption",
+          "type": "string"
+        },
+        "file_name": {
+          "title": "File Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "caption",
+        "artifact_id",
+        "file_name"
+      ],
+      "title": "FigureRef",
+      "type": "object"
+    },
+    "ManuscriptSection": {
+      "properties": {
+        "figures": {
+          "items": {
+            "$ref": "#/$defs/FigureRef"
+          },
+          "title": "Figures",
+          "type": "array"
+        },
+        "heading": {
+          "title": "Heading",
+          "type": "string"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "paragraphs": {
+          "items": {
+            "$ref": "#/$defs/Paragraph"
+          },
+          "title": "Paragraphs",
+          "type": "array"
+        },
+        "tables": {
+          "items": {
+            "$ref": "#/$defs/TableRef"
+          },
+          "title": "Tables",
+          "type": "array"
+        }
+      },
+      "required": [
+        "key",
+        "heading"
+      ],
+      "title": "ManuscriptSection",
+      "type": "object"
+    },
+    "Paragraph": {
+      "properties": {
+        "spans": {
+          "items": {
+            "$ref": "#/$defs/Span"
+          },
+          "title": "Spans",
+          "type": "array"
+        }
+      },
+      "required": [
+        "spans"
+      ],
+      "title": "Paragraph",
+      "type": "object"
+    },
+    "Span": {
+      "properties": {
+        "claim_ids": {
+          "description": "claim keys, e.g. CLM-0003",
+          "items": {
+            "type": "string"
+          },
+          "title": "Claim Ids",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "prior_work",
+            "observed_result",
+            "method",
+            "interpretation",
+            "hypothesis",
+            "limitation",
+            "contribution_statement",
+            "framing"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "origin": {
+          "default": "ai",
+          "enum": [
+            "ai",
+            "human"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "protected": {
+          "default": false,
+          "title": "Protected",
+          "type": "boolean"
+        },
+        "result_keys": {
+          "description": "result keys, e.g. RES-001",
+          "items": {
+            "type": "string"
+          },
+          "title": "Result Keys",
+          "type": "array"
+        },
+        "span_id": {
+          "title": "Span Id",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "span_id",
+        "text",
+        "kind"
+      ],
+      "title": "Span",
+      "type": "object"
+    },
+    "TableRef": {
+      "properties": {
+        "caption": {
+          "title": "Caption",
+          "type": "string"
+        },
+        "result_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Result Keys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "caption",
+        "result_keys"
+      ],
+      "title": "TableRef",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "acknowledgments": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Acknowledgments"
+    },
+    "keywords": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Keywords",
+      "type": "array"
+    },
+    "mode": {
+      "default": "paper",
+      "enum": [
+        "paper",
+        "proposal"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/ManuscriptSection"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "sections"
+  ],
+  "title": "ManuscriptContent",
+  "type": "object"
+}

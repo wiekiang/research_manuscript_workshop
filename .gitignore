@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+node_modules/
+.next/
+apps/web/test-results/
+apps/web/playwright-report/
+.env
+.env.*
+!.env.example
+var/
+*.egg-info/
+dist/
+.DS_Store
+coverage/
+
+# Product specification (kept locally, not versioned)
+PRODUCT_SPEC.md
+autonomous-ai-research-platform-implementation-plan.md

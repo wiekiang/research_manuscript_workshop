@@ -1,0 +1,28 @@
+{
+  "fixture_for": "M6 tests",
+  "output": {
+    "key": "limitations",
+    "heading": "Limitations",
+    "paragraphs": [
+      {
+        "spans": [
+          {
+            "text": "Eight pipelines is a small, non-random sample, so the study is exploratory.",
+            "kind": "limitation",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "The experiment itself was not re-run by an independent party.",
+            "kind": "limitation",
+            "claim_ids": [],
+            "result_keys": []
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "rationale": "Fixture draft of the Limitations section from the brief.",
+    "open_questions": []
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "$defs": {
+    "ExtractedClaim": {
+      "properties": {
+        "category": {
+          "description": "descriptive | numerical | comparative | causal | novelty | ethics_policy",
+          "title": "Category",
+          "type": "string"
+        },
+        "comparison": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Comparison"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Measure"
+        },
+        "passage_indices": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passage Indices",
+          "type": "array"
+        },
+        "population_or_dataset": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Population Or Dataset"
+        },
+        "proposition": {
+          "description": "one distinct proposition stated by the paper",
+          "title": "Proposition",
+          "type": "string"
+        },
+        "scope": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Scope"
+        }
+      },
+      "required": [
+        "proposition",
+        "category",
+        "passage_indices",
+        "population_or_dataset",
+        "measure",
+        "comparison",
+        "scope"
+      ],
+      "title": "ExtractedClaim",
+      "type": "object"
+    },
+    "ExtractedPassage": {
+      "properties": {
+        "quote": {
+          "description": "verbatim sentence(s) copied from the paper text",
+          "title": "Quote",
+          "type": "string"
+        },
+        "role": {
+          "description": "claim | method | result | limitation | population | dataset | definition",
+          "title": "Role",
+          "type": "string"
+        },
+        "section_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Section Hint"
+        },
+        "summary": {
+          "description": "neutral paraphrase of what the passage states",
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "quote",
+        "role",
+        "section_hint",
+        "summary"
+      ],
+      "title": "ExtractedPassage",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/ExtractedClaim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "limitations": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Limitations"
+    },
+    "methods": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Methods"
+    },
+    "passages": {
+      "items": {
+        "$ref": "#/$defs/ExtractedPassage"
+      },
+      "title": "Passages",
+      "type": "array"
+    },
+    "population_or_dataset": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Population Or Dataset"
+    },
+    "results": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Results"
+    }
+  },
+  "required": [
+    "methods",
+    "population_or_dataset",
+    "results",
+    "limitations",
+    "passages",
+    "claims"
+  ],
+  "title": "EvidenceExtraction",
+  "type": "object"
+}

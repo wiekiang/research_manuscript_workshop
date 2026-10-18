@@ -1,0 +1,39 @@
+{
+  "fixture_for": "M6 tests",
+  "output": {
+    "key": "results",
+    "heading": "Results",
+    "paragraphs": [
+      {
+        "spans": [
+          {
+            "text": "The restoration classifier reached 0.75 accuracy (6/8) on the eight pipelines.",
+            "kind": "observed_result",
+            "claim_ids": [
+              "CLM-0002"
+            ],
+            "result_keys": [
+              "RES-001"
+            ]
+          },
+          {
+            "text": "The accuracy was recomputed from the supplied raw outputs.",
+            "kind": "method",
+            "claim_ids": [],
+            "result_keys": []
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "caption": "Restoration classifier accuracy on eight R pipelines",
+        "result_keys": [
+          "RES-001"
+        ]
+      }
+    ],
+    "rationale": "Fixture draft of the Results section from the brief.",
+    "open_questions": []
+  }
+}

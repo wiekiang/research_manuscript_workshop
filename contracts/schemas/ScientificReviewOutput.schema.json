@@ -1,0 +1,112 @@
+{
+  "$defs": {
+    "ScientificFindingOut": {
+      "properties": {
+        "category": {
+          "enum": [
+            "question",
+            "protocol",
+            "evidence",
+            "contribution",
+            "conclusions",
+            "other"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "check": {
+          "title": "Check",
+          "type": "string"
+        },
+        "claim_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Claim Ids",
+          "type": "array"
+        },
+        "issue": {
+          "title": "Issue",
+          "type": "string"
+        },
+        "proposed_fix": {
+          "title": "Proposed Fix",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "blocker",
+            "major",
+            "minor",
+            "suggestion"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "span_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Span Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "severity",
+        "category",
+        "issue",
+        "rationale",
+        "check",
+        "proposed_fix",
+        "span_ids",
+        "claim_ids"
+      ],
+      "title": "ScientificFindingOut",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "conclusions": {
+      "title": "Conclusions",
+      "type": "string"
+    },
+    "contribution": {
+      "title": "Contribution",
+      "type": "string"
+    },
+    "evidence": {
+      "title": "Evidence",
+      "type": "string"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/ScientificFindingOut"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "protocol": {
+      "title": "Protocol",
+      "type": "string"
+    },
+    "question": {
+      "description": "assessment of the research question and its framing",
+      "title": "Question",
+      "type": "string"
+    }
+  },
+  "required": [
+    "question",
+    "protocol",
+    "evidence",
+    "contribution",
+    "conclusions",
+    "findings"
+  ],
+  "title": "ScientificReviewOutput",
+  "type": "object"
+}

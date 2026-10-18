@@ -1,0 +1,19 @@
+{
+  "home_headline": "From Call for Papers to Submission-Ready Manuscripts.",
+  "home_subhead": "You contribute the original research. We help turn it into a submission-ready manuscript.",
+  "responsibility_message": "Our platform helps with discovery, evidence review, research planning, manuscript development, and conference checks. You are responsible for the originality, validity, and integrity of your contribution.",
+  "responsibility_version": "responsibility-1",
+  "literature_setup_message": "You can use the core research workflow without an Elicit or Consensus subscription. We search available scholarly sources and review full text only when access allows. Some relevant studies may be missed. You can add papers and check the search coverage before using the review.",
+  "provider_connection_template": "Connecting your own {provider} account may add search or synthesis features. Your provider's access limits and charges may apply. This connection does not guarantee a complete literature review.",
+  "coverage_template": "Searched {sources} on {date}. Found {n} records; reviewed {m} full texts; {k} records have metadata or abstracts only. This review may miss relevant work. Check excluded or inaccessible papers and add important sources before approving claims.",
+  "contribution_workspace_title": "Your Original Research Contribution",
+  "contribution_workspace_fields": [
+    "Question and rationale",
+    "Methodological decisions",
+    "Data or theoretical work",
+    "Result interpretation",
+    "Limitations"
+  ],
+  "final_approval_declaration": "I have critically reviewed the scientific content, verified key findings and references, considered the documented literature coverage and access limits, made a substantive intellectual contribution, checked applicable venue policies and disclosures, and accept responsibility for this submission.",
+  "submission_ready_definition": "“Submission-ready” means the package passes the checks the platform can perform and has completed human gates. It is neither a guarantee of scientific validity, policy compliance, acceptance, nor eligibility for authorship."
+}

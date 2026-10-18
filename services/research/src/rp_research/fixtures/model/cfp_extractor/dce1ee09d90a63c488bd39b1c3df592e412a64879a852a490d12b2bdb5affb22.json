@@ -1,0 +1,261 @@
+{
+  "fixture_for": "icrds2027.html",
+  "output": {
+    "edition": {
+      "conference_name": "ICRDS 2027: International Conference on Reproducible Data Systems",
+      "acronym": "ICRDS",
+      "year": 2027,
+      "location": "Lisbon, Portugal",
+      "submission_url": "https://icrds27.hotcrp.example/",
+      "publication_outlet": "Conference proceedings",
+      "publisher": "ACM",
+      "official_site_url": null
+    },
+    "tracks": [
+      {
+        "name": "Research Papers Track",
+        "description": "Full research papers",
+        "paper_types": [
+          "research paper"
+        ],
+        "submission_categories": [
+          "full paper"
+        ],
+        "quote": "Research Papers Track"
+      },
+      {
+        "name": "Short Papers Track",
+        "description": "Short papers",
+        "paper_types": [
+          "short paper"
+        ],
+        "submission_categories": [
+          "short paper"
+        ],
+        "quote": "Short Papers Track"
+      }
+    ],
+    "rules": [
+      {
+        "rule_key": "length.page_limit",
+        "category": "length",
+        "track": "Research Papers Track",
+        "value_text": "At most 10 pages excluding references and appendices",
+        "value": "10",
+        "unit": "pages",
+        "blocking": true,
+        "quote": "Research papers must not exceed 10 pages, excluding references and appendices.",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "template.family",
+        "category": "template",
+        "track": "Research Papers Track",
+        "value_text": "ACM primary article template, sigconf option",
+        "value": "acm_acmart",
+        "unit": null,
+        "blocking": true,
+        "quote": "Submissions must use the ACM primary article template (acmart, sigconf option).",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "anonymization.mode",
+        "category": "anonymization",
+        "track": "Research Papers Track",
+        "value_text": "Double-blind review; anonymized submissions",
+        "value": "double_blind",
+        "unit": null,
+        "blocking": true,
+        "quote": "The review process is double-blind.",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "abstract.word_limit",
+        "category": "abstract",
+        "track": "Research Papers Track",
+        "value_text": "Abstract at most 250 words",
+        "value": "250",
+        "unit": "words",
+        "blocking": true,
+        "quote": "The abstract must not exceed 250 words.",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "supplementary.policy",
+        "category": "supplementary",
+        "track": "Research Papers Track",
+        "value_text": "Supplementary material up to 50 MB may accompany the paper; reviewers need not consult it",
+        "value": "50MB",
+        "unit": null,
+        "blocking": true,
+        "quote": "Supplementary material up to 50 MB may be uploaded together with the paper",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "length.page_limit",
+        "category": "length",
+        "track": "Short Papers Track",
+        "value_text": "At most 4 pages excluding references",
+        "value": "4",
+        "unit": "pages",
+        "blocking": true,
+        "quote": "Short papers are limited to 4 pages, excluding references.",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "anonymization.mode",
+        "category": "anonymization",
+        "track": "Short Papers Track",
+        "value_text": "Same anonymization rules as research papers",
+        "value": "double_blind",
+        "unit": null,
+        "blocking": true,
+        "quote": "Short papers follow the same anonymization rules as research papers.",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "dual_submission.policy",
+        "category": "dual_submission",
+        "track": null,
+        "value_text": "Must not be under review elsewhere",
+        "value": null,
+        "unit": null,
+        "blocking": true,
+        "quote": "Papers submitted to ICRDS 2027 must not be under review elsewhere",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "prior_publication.policy",
+        "category": "prior_publication",
+        "track": null,
+        "value_text": "Must not have been previously published in a peer-reviewed venue",
+        "value": null,
+        "unit": null,
+        "blocking": true,
+        "quote": "must not have been previously published in a peer-reviewed venue",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "preprint.policy",
+        "category": "preprint",
+        "track": null,
+        "value_text": "arXiv preprints permitted if the title differs",
+        "value": "permitted_with_different_title",
+        "unit": null,
+        "blocking": true,
+        "quote": "Posting a preprint on arXiv is permitted, provided the title differs from the submitted version.",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "ai_policy.statement",
+        "category": "ai_policy",
+        "track": null,
+        "value_text": "Generative AI may be used for language editing; other uses must be disclosed",
+        "value": null,
+        "unit": null,
+        "blocking": true,
+        "quote": "Authors may use generative AI tools for language editing; any other use must be disclosed in the acknowledgments or as otherwise specified by the publisher.",
+        "uncertainty": "Disclosure location depends on unspecified publisher policy"
+      },
+      {
+        "rule_key": "ethics.requirement",
+        "category": "ethics",
+        "track": null,
+        "value_text": "Human-subjects studies must state whether IRB approval was obtained",
+        "value": null,
+        "unit": null,
+        "blocking": true,
+        "quote": "Studies involving human subjects must state whether ethics approval was obtained from an institutional review board.",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "submission_system.name",
+        "category": "submission_system",
+        "track": null,
+        "value_text": "HotCRP",
+        "value": "hotcrp",
+        "unit": null,
+        "blocking": false,
+        "quote": "Papers are submitted through HotCRP",
+        "uncertainty": null
+      },
+      {
+        "rule_key": "fees.statement",
+        "category": "fees",
+        "track": null,
+        "value_text": "Registration fee of 500 EUR",
+        "value": "500 EUR",
+        "unit": null,
+        "blocking": false,
+        "quote": "The registration fee is 500 EUR per paper.",
+        "uncertainty": null
+      }
+    ],
+    "deadlines": [
+      {
+        "deadline_kind": "abstract_registration",
+        "track": null,
+        "date": "2027-01-14",
+        "time": null,
+        "timezone": "AoE",
+        "mandatory": true,
+        "quote": "Abstract registration (mandatory): Thursday, January 14, 2027 (AoE)",
+        "uncertainty": null
+      },
+      {
+        "deadline_kind": "full_paper",
+        "track": null,
+        "date": "2027-01-22",
+        "time": null,
+        "timezone": "AoE",
+        "mandatory": null,
+        "quote": "Full paper submission: January 21, 2027 (AoE)",
+        "uncertainty": null
+      },
+      {
+        "deadline_kind": "rebuttal",
+        "track": null,
+        "date": "2027-03-03",
+        "time": null,
+        "timezone": null,
+        "mandatory": null,
+        "quote": "Author response (rebuttal) period: March 3-5, 2027",
+        "uncertainty": "range"
+      },
+      {
+        "deadline_kind": "notification",
+        "track": null,
+        "date": "2027-03-20",
+        "time": null,
+        "timezone": null,
+        "mandatory": null,
+        "quote": "Notification of acceptance: March 20, 2027",
+        "uncertainty": null
+      },
+      {
+        "deadline_kind": "camera_ready",
+        "track": null,
+        "date": "2027-04-15",
+        "time": "23:59",
+        "timezone": "PDT",
+        "mandatory": null,
+        "quote": "Camera-ready deadline: April 15, 2027 at 23:59 PDT",
+        "uncertainty": null
+      },
+      {
+        "deadline_kind": "author_registration",
+        "track": null,
+        "date": "2027-05-01",
+        "time": null,
+        "timezone": null,
+        "mandatory": null,
+        "quote": "Author registration deadline: May 1, 2027",
+        "uncertainty": null
+      }
+    ],
+    "uncertainties": [
+      "Rebuttal is a period; the start date is recorded",
+      "No timezone stated for several dates"
+    ]
+  }
+}

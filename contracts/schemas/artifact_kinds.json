@@ -1,0 +1,430 @@
+{
+  "generic_json": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "model_output": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "source_snapshot": {
+    "media_types": [
+      "text/html",
+      "application/pdf",
+      "text/plain",
+      "application/xhtml+xml"
+    ],
+    "max_bytes": 26214400,
+    "worker_producible": true
+  },
+  "source_text": {
+    "media_types": [
+      "application/json",
+      "text/plain"
+    ],
+    "max_bytes": 20971520,
+    "worker_producible": true
+  },
+  "cfp_extraction": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "cfp_validation": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "cfp_ruleset": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": false
+  },
+  "deadline_schedule": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": false
+  },
+  "discovery_result": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "template_archive": {
+    "media_types": [
+      "application/zip"
+    ],
+    "max_bytes": 52428800,
+    "worker_producible": true
+  },
+  "template_manifest": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": true
+  },
+  "compile_report": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": true
+  },
+  "compiled_pdf": {
+    "media_types": [
+      "application/pdf"
+    ],
+    "max_bytes": 52428800,
+    "worker_producible": true
+  },
+  "compile_log": {
+    "media_types": [
+      "text/plain"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": true
+  },
+  "latex_source_bundle": {
+    "media_types": [
+      "application/zip"
+    ],
+    "max_bytes": 52428800,
+    "worker_producible": true
+  },
+  "search_run_record": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 20971520,
+    "worker_producible": true
+  },
+  "paper_fulltext": {
+    "media_types": [
+      "application/pdf",
+      "application/xml",
+      "text/xml",
+      "text/html",
+      "text/plain"
+    ],
+    "max_bytes": 52428800,
+    "worker_producible": true
+  },
+  "evidence_extraction": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": true
+  },
+  "coverage_assessment": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": false
+  },
+  "opportunity_set": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "paper_rationale": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": true
+  },
+  "feasibility_assessment": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": true
+  },
+  "study_type_recommendation": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": true
+  },
+  "research_direction": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": false
+  },
+  "protocol": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": false
+  },
+  "methodology_review": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "contribution_file": {
+    "media_types": [
+      "text/csv",
+      "application/json",
+      "text/plain",
+      "text/markdown",
+      "application/pdf",
+      "text/x-python",
+      "application/x-ipynb+json",
+      "application/zip",
+      "image/png",
+      "image/svg+xml",
+      "application/x-tex",
+      "text/x-tex"
+    ],
+    "max_bytes": 209715200,
+    "worker_producible": false
+  },
+  "result_manifest": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": false
+  },
+  "result_assessment": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "contribution_matrix": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": false
+  },
+  "method_stage_output": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 20971520,
+    "worker_producible": true
+  },
+  "manuscript_version": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 20971520,
+    "worker_producible": false
+  },
+  "generation_candidate": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 20971520,
+    "worker_producible": true
+  },
+  "manuscript_brief": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 20971520,
+    "worker_producible": false
+  },
+  "figure": {
+    "media_types": [
+      "image/png",
+      "application/pdf",
+      "image/svg+xml"
+    ],
+    "max_bytes": 20971520,
+    "worker_producible": true
+  },
+  "bibliography": {
+    "media_types": [
+      "application/x-bibtex",
+      "text/plain"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "review_report": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": true
+  },
+  "meta_review": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": true
+  },
+  "compliance_report": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": true
+  },
+  "integrity_report": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": true
+  },
+  "eligibility_assessment": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": false
+  },
+  "readiness_assessment": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": false
+  },
+  "content_manifest": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": false
+  },
+  "author_record": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": false
+  },
+  "disclosure_statement": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": false
+  },
+  "export_package": {
+    "media_types": [
+      "application/zip"
+    ],
+    "max_bytes": 209715200,
+    "worker_producible": true
+  },
+  "experiment_code": {
+    "media_types": [
+      "application/zip",
+      "text/x-python"
+    ],
+    "max_bytes": 52428800,
+    "worker_producible": false
+  },
+  "experiment_input": {
+    "media_types": [
+      "text/csv",
+      "application/json",
+      "application/zip",
+      "text/plain"
+    ],
+    "max_bytes": 209715200,
+    "worker_producible": false
+  },
+  "experiment_raw_output": {
+    "media_types": [
+      "application/zip",
+      "application/json",
+      "text/csv",
+      "text/plain"
+    ],
+    "max_bytes": 209715200,
+    "worker_producible": true
+  },
+  "experiment_log": {
+    "media_types": [
+      "text/plain"
+    ],
+    "max_bytes": 20971520,
+    "worker_producible": true
+  },
+  "run_manifest": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "recomputation_report": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 5242880,
+    "worker_producible": true
+  },
+  "experiment_plan": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": false
+  },
+  "environment_manifest": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 2097152,
+    "worker_producible": true
+  },
+  "synthesis_record": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": false
+  },
+  "review_appendix": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": false
+  },
+  "qualitative_codebook": {
+    "media_types": [
+      "application/json"
+    ],
+    "max_bytes": 10485760,
+    "worker_producible": false
+  }
+}

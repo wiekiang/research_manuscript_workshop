@@ -1,0 +1,36 @@
+{
+  "fixture_for": "M6 tests",
+  "output": {
+    "key": "related_work",
+    "heading": "Related Work",
+    "paragraphs": [
+      {
+        "spans": [
+          {
+            "text": "Studies of Python pipelines found that recording library versions restored most pipelines whose outputs changed after re-execution.",
+            "kind": "prior_work",
+            "claim_ids": [
+              "CLM-0001"
+            ],
+            "result_keys": []
+          },
+          {
+            "text": "Pip is the most widely used package manager for data science.",
+            "kind": "prior_work",
+            "claim_ids": [],
+            "result_keys": []
+          },
+          {
+            "text": "These findings motivate testing the approach in another ecosystem.",
+            "kind": "interpretation",
+            "claim_ids": [],
+            "result_keys": []
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "rationale": "Fixture draft of the Related Work section from the brief.",
+    "open_questions": []
+  }
+}

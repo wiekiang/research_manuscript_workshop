@@ -1,0 +1,19 @@
+{
+  "fixture_for": "M7 tests",
+  "output": {
+    "spans": [
+      {
+        "span_id": "S-41c3141e8e",
+        "verdict": "faithful",
+        "rationale": "Matches RES-001 (6/8, 0.75).",
+        "suggested_wording": null
+      },
+      {
+        "span_id": "S-47b6b7ef05",
+        "verdict": "faithful",
+        "rationale": "Restates the claim exactly.",
+        "suggested_wording": null
+      }
+    ]
+  }
+}
