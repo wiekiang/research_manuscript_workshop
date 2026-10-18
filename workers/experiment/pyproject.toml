@@ -2,6 +2,7 @@
 name = "rp-experiment"
 version = "0.1.0"
 description = "Sandboxed computational experiment execution, metric recomputation and reproducibility"
+license = "Apache-2.0"
 requires-python = ">=3.13"
 dependencies = [
     "rp-contracts",

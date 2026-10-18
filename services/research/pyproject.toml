@@ -2,6 +2,7 @@
 name = "rp-research"
 version = "0.1.0"
 description = "Temporal workflows, research activities, scholarly adapters, controlled fetch, model gateway, LangGraph agents"
+license = "Apache-2.0"
 requires-python = ">=3.13"
 dependencies = [
     "rp-contracts",
