@@ -1,9 +1,0 @@
-{
-  "identities": [
-    {
-      "name": "rp_dev",
-      "credentials": [{ "accessKey": "rp_dev_access", "secretKey": "rp_dev_secret_key" }],
-      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
-    }
-  ]
-}

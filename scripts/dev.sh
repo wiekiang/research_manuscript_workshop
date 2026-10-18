@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Local development stack: infra containers, migrations, API, outbox relay and Temporal workers.
-#   scripts/dev.sh up      start everything (logs in var/log/)
-#   scripts/dev.sh down    stop app processes (containers keep running; use `docker compose -f infra/compose.yaml down`)
+# Local development app processes: migrations, API, outbox relay and Temporal workers (logs in var/log/).
+# Infrastructure is NOT started here (the Docker setup was removed): PostgreSQL 17 + pgvector, an S3-compatible
+# object store and a Temporal server must already be reachable at the RP_* / RP_WORKER_* settings.
+#   scripts/dev.sh up      start the app processes
+#   scripts/dev.sh down    stop them
 #   scripts/dev.sh status
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -18,8 +20,8 @@ start() { # name, command...
 
 case "${1:-up}" in
   up)
-    docker compose -f infra/compose.yaml up -d
-    until docker compose -f infra/compose.yaml exec -T postgres pg_isready -U rp_owner -d research_platform >/dev/null 2>&1; do sleep 1; done
+    uv run python -c "import psycopg,os; psycopg.connect(os.environ.get('RP_DATABASE_URL_OWNER','postgresql://rp_owner:rp_owner_dev@localhost:5433/research_platform').replace('+psycopg','')).close()" \
+      || { echo "PostgreSQL is not reachable; start your database (see docs/DEPLOYMENT.md) and retry." >&2; exit 1; }
     (cd apps/api && uv run alembic upgrade head)
     start api uv run rp-api serve --host 127.0.0.1 --port 8000
     start relay uv run rp-api relay

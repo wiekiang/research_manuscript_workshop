@@ -90,7 +90,7 @@ class Settings(BaseSettings):
 
     # Platform operators may curate global reference data (venue registry, provider gates). MFA required.
     platform_operators: list[str] = Field(default_factory=list)
-    # Experiment sandbox allowlist: key -> immutable image reference (local image ID or registry digest; infra/images.lock)
+    # Experiment sandbox allowlist: key -> immutable image reference (registry digest or local image ID)
     experiment_images: dict[str, str] = Field(default_factory=lambda: {
         "python-sci:1": "sha256:81d4e66c6640c6a0dce663f3094d0578e2d771ab0f186ed4972e9fa09f783cda"})
 

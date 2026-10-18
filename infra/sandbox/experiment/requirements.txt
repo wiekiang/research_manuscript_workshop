@@ -1,2 +1,0 @@
-# Experiment sandbox packages (pinned). Changing this file requires a new image tag and a new images.lock entry.
-numpy==2.3.3
