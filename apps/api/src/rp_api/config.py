@@ -13,7 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 class Settings(BaseSettings):
     """All runtime configuration. Secrets are SecretStr and never logged."""
 
-    model_config = SettingsConfigDict(env_prefix="RP_", env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_prefix="RP_", env_file=(REPO_ROOT / ".env", ".env"), extra="ignore")
 
     environment: Literal["local", "test", "staging", "production"] = "local"
     product_name: str = "Research Manuscript Workspace"

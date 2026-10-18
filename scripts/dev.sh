@@ -10,6 +10,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LOG="$ROOT/var/log"; RUN="$ROOT/var/run"
 mkdir -p "$LOG" "$RUN"
 cd "$ROOT"
+# Settings (database URLs, credentials) come from the git-ignored .env at the repo root; see .env.example.
+if [[ -f .env ]]; then set -a; source .env; set +a; fi
 
 start() { # name, command...
   local name=$1; shift

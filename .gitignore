@@ -15,6 +15,9 @@ var/
 dist/
 .DS_Store
 coverage/
+infra/env/
 
 # Product specification (kept locally, not versioned)
+docs/
 PRODUCT_SPEC.md
+AGENTS.md
