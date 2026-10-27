@@ -11,6 +11,7 @@ import sys
 import tempfile
 import uuid
 from pathlib import Path
+from urllib.parse import urlsplit
 
 TEST_DB = os.environ.get("RP_TEST_DB", "research_platform_test")
 HOST = os.environ.get("RP_TEST_DB_HOST", "localhost:5433")
@@ -35,9 +36,32 @@ def configure_test_env() -> Path:
     return tmp
 
 
+def _require_throwaway_target(host: str, owner_url: str | None) -> None:
+    """Refuse destructive resets unless both the DSN target and the owner URL name the throwaway test cluster.
+
+    The database name is taken from RP_DATABASE_URL_OWNER (set by configure_test_env from HOST and TEST_DB),
+    so the equality check compares two independently supplied names instead of TEST_DB with itself.
+    """
+    if not owner_url:
+        raise RuntimeError(f"refusing to reset on host {host!r}: RP_DATABASE_URL_OWNER is not set, so the "
+                           "database to drop cannot be verified")
+    try:
+        parts = urlsplit(owner_url)
+        url_host = f"{parts.hostname}:{parts.port}" if parts.port else (parts.hostname or "")
+    except ValueError as exc:
+        raise RuntimeError(f"refusing to reset on host {host!r}: RP_DATABASE_URL_OWNER is not parseable ({exc})") from exc
+    db = (parts.path or "").lstrip("/")
+    name, _, port = host.partition(":")
+    if (name != "localhost" or port != "5433" or url_host != "localhost:5433"
+            or db != TEST_DB or not db.endswith("_test")):
+        raise RuntimeError(f"refusing to reset database {db!r} on host {host!r} (owner URL host {url_host!r}): "
+                           f"only {TEST_DB!r} (a *_test database) on localhost:5433 may be dropped")
+
+
 def reset_database() -> None:
     import psycopg
 
+    _require_throwaway_target(HOST, os.environ.get("RP_DATABASE_URL_OWNER"))
     owner = f"postgresql://rp_owner:rp_owner_dev@{HOST}/{TEST_DB}"
     with psycopg.connect(owner, autocommit=True) as conn:
         conn.execute("DROP SCHEMA IF EXISTS public CASCADE")
