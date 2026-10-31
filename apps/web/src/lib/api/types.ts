@@ -1033,6 +1033,13 @@ export interface SpanIssue {
     message: string;
 }
 
+/** A table issue. Tables have no span ID, so they are located by section key, index and caption. */
+export interface TableIssue extends SpanIssue {
+    section: string;
+    table_index: number;
+    caption: string;
+}
+
 export interface ContentSpan {
     span_id: string;
     text: string;
@@ -1081,7 +1088,7 @@ export interface ManuscriptVersion {
     change_summary: string | null;
     created_by: string;
     created_at: string;
-    checks: { spans?: number; spans_with_issues?: number; unresolved_claims?: number; blockers?: number; abstract_words?: number };
+    checks: { spans?: number; spans_with_issues?: number; unresolved_claims?: number; blockers?: number; abstract_words?: number; table_issues?: TableIssue[] };
     content: ManuscriptContent | null;
     spans: SpanRecord[];
 }

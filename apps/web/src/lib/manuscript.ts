@@ -3,7 +3,7 @@
  * PATCH payloads and to interpret apply/merge refusals. Mirrors contracts/src/rp_contracts/manuscript.py.
  */
 import { ApiError } from "@/lib/api/client";
-import type { ContentSection, ContentSpan, GenerationCandidate, SectionDiff, SpanIssue, SpanKind, SpanRecord } from "@/lib/api/types";
+import type { ContentSection, ContentSpan, GenerationCandidate, ManuscriptVersion, SectionDiff, SpanIssue, SpanKind, SpanRecord, TableIssue } from "@/lib/api/types";
 
 export const SPAN_KINDS: SpanKind[] = ["framing", "prior_work", "method", "observed_result", "interpretation", "hypothesis", "limitation", "contribution_statement"];
 
@@ -108,6 +108,28 @@ export interface EditableSpan {
     result_keys: string;
 }
 
+export interface EditableTable {
+    caption: string;
+    result_keys: string;
+}
+
+/** Anchor id of a table in the read view, so check results can link to where the table occurs. */
+export function tableAnchor(sectionKey: string, index: number): string {
+    return `table-${sectionKey}-${index}`;
+}
+
+/**
+ * Table check issues recorded on the committed version for one table, matched by the contract's locating fields
+ * (section key + table index). Tables have no span_id, so this is how the server points at one.
+ */
+export function tableIssuesFor(sectionKey: string, index: number, checks: ManuscriptVersion["checks"] | undefined): TableIssue[] {
+    return (checks?.table_issues ?? []).filter((i) => i.section === sectionKey && i.table_index === index);
+}
+
+export function toEditableTables(section: ContentSection): EditableTable[] {
+    return section.tables.map((t) => ({ caption: t.caption, result_keys: t.result_keys.join(", ") }));
+}
+
 export function toEditable(section: ContentSection): EditableSpan[][] {
     return section.paragraphs.map((p) =>
         p.spans.map((s) => ({ span_id: s.span_id, text: s.text, kind: s.kind, claim_ids: s.claim_ids.join(", "), result_keys: s.result_keys.join(", ") })),
@@ -122,12 +144,17 @@ function splitIds(v: string): string[] {
 }
 
 /**
- * Build the PATCH section from edited spans. Provenance (origin/protected) is decided by the server: unchanged text
- * keeps its recorded origin, changed or new text becomes human-authored. Empty sentences and paragraphs are dropped.
+ * Build the PATCH section from edited spans (and, when given, edited tables). Provenance (origin/protected) is
+ * decided by the server: unchanged text keeps its recorded origin, changed or new text becomes human-authored.
+ * Empty sentences and paragraphs are dropped; a table left with no caption and no result keys is dropped too.
  */
-export function fromEditable(section: ContentSection, paragraphs: EditableSpan[][]): ContentSection {
+export function fromEditable(section: ContentSection, paragraphs: EditableSpan[][], tables?: EditableTable[]): ContentSection {
     return {
         ...section,
+        tables:
+            tables === undefined
+                ? section.tables
+                : tables.map((t) => ({ caption: t.caption.trim(), result_keys: splitIds(t.result_keys) })).filter((t) => t.caption || t.result_keys.length > 0),
         paragraphs: paragraphs
             .map((p) => ({
                 spans: p

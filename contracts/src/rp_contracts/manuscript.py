@@ -87,6 +87,11 @@ class ManuscriptContent(BaseModel):
                 for sp in p.spans:
                     yield s, sp
 
+    def tables(self):
+        for s in self.sections:
+            for i, t in enumerate(s.tables):
+                yield s, i, t
+
 
 # --------------------------------------------------------------------------- writer agent IO
 class DraftSpan(BaseModel):
@@ -191,6 +196,35 @@ def check_span(sp: Span, ctx: dict) -> list[dict]:
     return issues
 
 
+def check_table(t: TableRef, ctx: dict) -> list[dict]:
+    """Deterministic checks for one result table. Tables are rendered from committed result metrics and never from
+    writer prose, so a table naming a key that is not a committed result renders a captioned table with no rows at
+    all. Report that instead of emitting the empty table silently. Same ctx as check_span; the issue shape matches
+    span issues ({code, severity, message}) so existing consumers can render these unchanged."""
+    issues = []
+    results = ctx["results"]
+    unknown = [rk for rk in t.result_keys if results.get(rk) is None]
+    for rk in unknown:
+        issues.append({"code": "unknown_table_result", "severity": "blocker",
+                       "message": f"{rk} is not a committed result; the table would render with no rows for it"})
+    if t.result_keys and ctx.get("mode") == "proposal":
+        issues.append({"code": "result_in_proposal", "severity": "blocker",
+                       "message": "results cannot be tabulated as observed before H3"})
+    # Only worth reporting once the keys themselves check out: an unknown key already explains the empty render.
+    if not unknown and not any((results.get(rk) or {}).get("metrics") for rk in t.result_keys):
+        issues.append({"code": "empty_table", "severity": "major",
+                       "message": "this table cites no result metrics and would render empty; cite a result with "
+                                  "metrics or remove the table"})
+    return issues
+
+
+def check_tables(content: ManuscriptContent, ctx: dict) -> list[dict]:
+    """Every table issue in the document, each located by section key, table index and caption (tables have no span
+    ID to hang issues on)."""
+    return [{"section": s.key, "table_index": i, "caption": t.caption, **issue}
+            for s, i, t in content.tables() for issue in check_table(t, ctx)]
+
+
 # --------------------------------------------------------------------------- rendering and diffs
 def render_document(content: ManuscriptContent, *, claim_citations: dict[str, list[str]], results: dict[str, dict],
                     authors: list[Author], bibtex: str, anonymous: bool) -> ManuscriptDocument:
@@ -229,19 +263,45 @@ def render_document(content: ManuscriptContent, *, claim_citations: dict[str, li
 
 
 def section_text(s: ManuscriptSection | None) -> str:
+    """Prose only: what the reader sees. Used for word counts and emptiness checks, never for diffing."""
     if s is None:
         return ""
     return "\n\n".join(" ".join(sp.text for sp in p.spans) for p in s.paragraphs)
+
+
+def span_line(sp: Span) -> str:
+    """One reviewable line per sentence: the prose plus the provenance a reviewer must be able to audit. Re-kinding
+    a sentence or re-pointing its claim/result links changes no prose, so without this the edit leaves no diff."""
+    bits = [sp.kind]
+    if sp.claim_ids:
+        bits.append("claims " + ", ".join(sp.claim_ids))
+    if sp.result_keys:
+        bits.append("results " + ", ".join(sp.result_keys))
+    return f"{sp.text} [{'; '.join(bits)}]"
+
+
+def diff_lines(s: ManuscriptSection | None) -> list[str]:
+    """Newline-terminated lines for difflib: one per sentence, a blank line between paragraphs, then the result
+    tables (which are part of the section's evidence but carry no prose)."""
+    if s is None:
+        return []
+    out: list[str] = []
+    for i, p in enumerate(s.paragraphs):
+        if i:
+            out.append("\n")
+        out += [span_line(sp) + "\n" for sp in p.spans]
+    out += [f"[table] {t.caption} <- {', '.join(t.result_keys) or 'no results'}\n" for t in s.tables]
+    return out
 
 
 def diff_sections(a: ManuscriptContent | None, b: ManuscriptContent) -> list[dict]:
     out = []
     keys = [s.key for s in b.sections] + [s.key for s in (a.sections if a else []) if not b.section(s.key)]
     for k in dict.fromkeys(keys):
-        before, after = section_text(a.section(k) if a else None), section_text(b.section(k))
+        before, after = diff_lines(a.section(k) if a else None), diff_lines(b.section(k))
         if before != after:
             out.append({"section": k, "diff": "".join(difflib.unified_diff(
-                before.splitlines(True), after.splitlines(True), fromfile=f"{k} (current)", tofile=f"{k} (proposed)", n=1))})
+                before, after, fromfile=f"{k} (current)", tofile=f"{k} (proposed)", n=1))})
     return out
 
 

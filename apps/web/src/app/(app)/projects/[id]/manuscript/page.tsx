@@ -7,7 +7,7 @@ import { CandidatesPanel } from "@/components/manuscript/candidates-panel";
 import { CompilePanel } from "@/components/manuscript/compile-panel";
 import { DraftRequest } from "@/components/manuscript/draft-request";
 import { SectionEditor } from "@/components/manuscript/section-editor";
-import { SpanView } from "@/components/manuscript/span-view";
+import { SpanView, TableView } from "@/components/manuscript/span-view";
 import { VersionsPanel } from "@/components/manuscript/versions-panel";
 import { useProject } from "@/components/project/project-context";
 import { ErrorAlert } from "@/components/research/error-alert";
@@ -17,7 +17,7 @@ import { useResource } from "@/hooks/use-resource";
 import { api } from "@/lib/api/client";
 import type { ManuscriptView, Task, TemplateEntry } from "@/lib/api/types";
 import { formatDateTime } from "@/lib/format";
-import { GAP_SECTION_LABEL, VERSION_ORIGIN_LABEL, spansBySection } from "@/lib/manuscript";
+import { GAP_SECTION_LABEL, VERSION_ORIGIN_LABEL, spansBySection, tableAnchor, tableIssuesFor } from "@/lib/manuscript";
 
 const ACTIVE = ["queued", "running", "failed_retryable"];
 
@@ -82,7 +82,8 @@ export default function ManuscriptPage() {
                             {VERSION_ORIGIN_LABEL[v.origin] ?? v.origin} · {formatDateTime(v.created_at)}
                         </span>
                         <span className="text-xs text-tertiary">
-                            {v.checks.spans ?? 0} sentences · {v.checks.blockers ?? 0} blocker(s) · {v.checks.unresolved_claims ?? 0} unresolved claim(s) · abstract {v.checks.abstract_words ?? 0} words
+                            {v.checks.spans ?? 0} sentences · {v.checks.blockers ?? 0} blocker(s) · {v.checks.unresolved_claims ?? 0} unresolved claim(s) · {(v.checks.table_issues ?? []).length} table issue(s) ·
+                            abstract {v.checks.abstract_words ?? 0} words
                         </span>
                     </div>
                 )}
@@ -119,6 +120,7 @@ export default function ManuscriptPage() {
                                             manuscriptId={m.id}
                                             section={s}
                                             expectedVersion={v.version}
+                                            tableIssues={(v.checks.table_issues ?? []).filter((i) => i.section === s.key)}
                                             onSaved={() => {
                                                 setEditing(null);
                                                 reloadAll();
@@ -139,10 +141,8 @@ export default function ManuscriptPage() {
                                                     ))}
                                                 </div>
                                             ))}
-                                            {s.tables.map((t) => (
-                                                <p key={t.caption} className="rounded-lg bg-secondary p-2 text-xs text-tertiary">
-                                                    Table “{t.caption}” is rendered from committed results {t.result_keys.join(", ")} at compile time, never from writer prose.
-                                                </p>
+                                            {s.tables.map((t, ti) => (
+                                                <TableView key={ti} sectionKey={s.key} index={ti} caption={t.caption} resultKeys={t.result_keys} issues={tableIssuesFor(s.key, ti, v.checks)} projectId={pid} />
                                             ))}
                                         </>
                                     )}
@@ -163,6 +163,24 @@ export default function ManuscriptPage() {
                                                     {q.text}
                                                 </a>
                                                 <span className="block text-xs text-tertiary">{q.section}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                            <div className="flex flex-col gap-2 rounded-xl p-4 ring-1 ring-secondary" data-testid="table-issues">
+                                <h2 className="text-sm font-semibold text-primary">Table issues</h2>
+                                <p className="text-xs text-tertiary">Tables citing keys that are not committed results would compile with no rows; blockers stop completion.</p>
+                                {(v.checks.table_issues ?? []).length === 0 ? (
+                                    <p className="text-sm text-tertiary">None.</p>
+                                ) : (
+                                    <ul className="flex flex-col gap-2">
+                                        {v.checks.table_issues!.map((i, n) => (
+                                            <li key={n} className="text-sm">
+                                                <a href={`#${tableAnchor(i.section, i.table_index)}`} className="text-secondary underline-offset-2 hover:underline">
+                                                    Table “{i.caption}”: {i.message}
+                                                </a>
+                                                <span className="block text-xs text-tertiary">{i.section}</span>
                                             </li>
                                         ))}
                                     </ul>

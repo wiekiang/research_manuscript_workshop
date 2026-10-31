@@ -1,7 +1,7 @@
 import { CpuChip01, Lock01, User01 } from "@untitledui/icons";
 import { StatusBadge } from "@/components/research/status-badge";
-import type { ContentSpan, SpanIssue, SpanRecord } from "@/lib/api/types";
-import { SPAN_KIND_LABEL, issueTone, originLabel, severityLabel, sortIssues, spanStatusKey } from "@/lib/manuscript";
+import type { ContentSpan, SpanIssue, SpanRecord, TableIssue } from "@/lib/api/types";
+import { SPAN_KIND_LABEL, issueTone, originLabel, severityLabel, sortIssues, spanStatusKey, tableAnchor } from "@/lib/manuscript";
 import { cx } from "@/utils/cx";
 
 const TONE_CLASS = {
@@ -21,10 +21,10 @@ export function OriginLabel({ origin }: { origin: string }) {
     );
 }
 
-export function IssueList({ issues }: { issues: SpanIssue[] }) {
+export function IssueList({ issues, label = "Span check issues" }: { issues: SpanIssue[]; label?: string }) {
     if (issues.length === 0) return null;
     return (
-        <ul className="flex flex-col gap-1" aria-label="Span check issues">
+        <ul className="flex flex-col gap-1" aria-label={label}>
             {sortIssues(issues).map((i, idx) => (
                 <li key={`${i.code}-${idx}`} data-testid="span-issue" data-severity={i.severity} data-code={i.code} className={cx("rounded-md border px-2 py-1 text-xs", TONE_CLASS[issueTone(i.severity)])}>
                     <span className="font-semibold">{severityLabel(i.severity)}</span>
@@ -32,6 +32,39 @@ export function IssueList({ issues }: { issues: SpanIssue[] }) {
                 </li>
             ))}
         </ul>
+    );
+}
+
+/**
+ * One result table of a section: the caption, the committed result keys it is rendered from, and the deterministic
+ * table check results of the committed version. A table citing a key that is not a committed result would compile to
+ * a captioned table with no rows, so the server reports it as a blocker; it is fixed by editing the section's tables.
+ */
+export function TableView({ sectionKey, index, caption, resultKeys, issues, projectId }: { sectionKey: string; index: number; caption: string; resultKeys: string[]; issues: TableIssue[]; projectId: string }) {
+    const blocker = issues.some((i) => i.severity === "blocker");
+    return (
+        <div
+            id={tableAnchor(sectionKey, index)}
+            data-testid="manuscript-table"
+            data-section={sectionKey}
+            data-table-index={index}
+            data-status={blocker ? "blocked" : issues.length ? "issues" : "ok"}
+            className={cx("flex flex-col gap-1.5 rounded-lg bg-secondary p-2 ring-1 ring-inset", blocker ? "ring-error_subtle" : issues.length ? "ring-utility-amber-300" : "ring-secondary")}
+        >
+            <p className="text-xs text-tertiary">
+                Table “{caption}” is rendered from committed results{" "}
+                {resultKeys.map((r, i) => (
+                    <span key={r}>
+                        {i > 0 && ", "}
+                        <a href={`/projects/${projectId}/contributions`} className="font-mono text-brand-secondary underline-offset-2 hover:underline" title="Cited committed result">
+                            {r}
+                        </a>
+                    </span>
+                ))}{" "}
+                at compile time, never from writer prose.
+            </p>
+            <IssueList issues={issues} label="Table check issues" />
+        </div>
     );
 }
 

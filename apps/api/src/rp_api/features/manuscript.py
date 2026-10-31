@@ -20,6 +20,7 @@ from rp_contracts.manuscript import (
     ManuscriptSection,
     Paragraph,
     check_span,
+    check_tables,
     diff_sections,
     plan_for,
     render_document,
@@ -231,11 +232,15 @@ async def commit_version(db: AsyncSession, actor, project: Project, m: Manuscrip
     ctx = await check_context(db, project)
     ctx["mode"] = content.mode if content.mode == "proposal" else ctx["mode"]
     issues_by_span = {sp.span_id: check_span(sp, ctx) for _, sp in content.spans()}
+    # Tables have no span row to hang issues on, so they are recorded on the version's checks summary.
+    table_issues = check_tables(content, ctx)
     abstract_words = word_count(section_text(content.section("abstract")))
     summary_checks = {"spans": sum(1 for _ in content.spans()),
                       "spans_with_issues": sum(1 for v in issues_by_span.values() if v),
                       "unresolved_claims": sum(1 for v in issues_by_span.values() if any(i["code"] == "unsupported_factual_span" for i in v)),
-                      "blockers": sum(1 for v in issues_by_span.values() for i in v if i["severity"] == "blocker"),
+                      "blockers": sum(1 for v in issues_by_span.values() for i in v if i["severity"] == "blocker")
+                      + sum(1 for i in table_issues if i["severity"] == "blocker"),
+                      "table_issues": table_issues,
                       "abstract_words": abstract_words}
     prev_id = m.current_version_id
     deps = [brief_artifact_id] if brief_artifact_id else []
@@ -416,7 +421,7 @@ async def edit_manuscript(manuscript_id: uuid.UUID, body: EditIn, ctx: Ctx = Dep
     before = content.model_copy(deep=True)
     old = {sp.span_id: sp for _, sp in content.spans()}
     plan_keys = {k for k, _ in plan_for(m.study_type)} | {s.key for s in content.sections}
-    changed, n = [], 0
+    changed, n, relinked = [], 0, []
     for s in body.sections:
         if s.key not in plan_keys:
             raise unprocessable("unknown_section", f"section {s.key} is not part of this manuscript")
@@ -425,8 +430,16 @@ async def edit_manuscript(manuscript_id: uuid.UUID, body: EditIn, ctx: Ctx = Dep
             for sp in p.spans:
                 prev = old.get(sp.span_id)
                 if prev is not None and prev.text == sp.text:
-                    # Unchanged text keeps its recorded provenance; clients cannot relabel AI text as human or unprotect it.
-                    sp.origin, sp.protected = prev.origin, prev.protected
+                    # Unchanged text keeps its recorded provenance; clients cannot relabel AI text as human or
+                    # unprotect it. Re-kinding a sentence or re-pointing its claim/result links is still a human
+                    # act on the evidence trail: the prose keeps its author, but the curation is protected from
+                    # regeneration and recorded for review.
+                    sp.origin = prev.origin
+                    changes = [f"{f} {getattr(prev, f)} -> {getattr(sp, f)}"
+                               for f in ("kind", "claim_ids", "result_keys") if getattr(prev, f) != getattr(sp, f)]
+                    sp.protected = prev.protected or bool(changes)
+                    if changes:
+                        relinked.append(f"{s.key}/{sp.span_id}: " + "; ".join(changes))
                 else:
                     n += 1
                     sp.origin, sp.protected = "human", True
@@ -437,12 +450,13 @@ async def edit_manuscript(manuscript_id: uuid.UUID, body: EditIn, ctx: Ctx = Dep
             content.sections[content.sections.index(existing)] = s
         changed.append(s.key)
     diffs = diff_sections(before, content)
+    note = f" ({len(relinked)} sentence(s) relinked)" if relinked else ""
     v = await commit_version(ctx.db, ctx.principal, project, m, content, origin="human_edit",
-                             summary=body.summary or f"edited {', '.join(changed)}")
+                             summary=body.summary or f"edited {', '.join(changed)}{note}")
     await ledger.capture(ctx.db, ctx.principal, project, LedgerCategory.MANUSCRIPT_CHANGE,
-                         f"Edited manuscript sections: {', '.join(changed)}", source_action="manuscript.edit",
-                         diff="\n".join(d["diff"] for d in diffs)[:20000] or None, artifact_id=v.artifact_id,
-                         rationale=body.summary)
+                         f"Edited manuscript sections: {', '.join(changed)}{note}", source_action="manuscript.edit",
+                         diff="\n".join([*(d["diff"] for d in diffs), *(["Relinked:", *relinked] if relinked else [])])[:20000] or None,
+                         artifact_id=v.artifact_id, rationale=body.summary)
     await ctx.db.commit()
     return version_out(v)
 
@@ -614,6 +628,10 @@ async def manuscript_complete(db: AsyncSession, project: Project) -> GateResult:
     blockers = [s for s in spans if any(i["severity"] == "blocker" for i in s.issues)]
     if blockers:
         reasons.append(f"{len(blockers)} span(s) have blocking issues (unknown/unverified critical claims, overstated contribution)")
+    tbl = [i for i in (v.checks_summary.get("table_issues") or []) if i["severity"] == "blocker"]
+    if tbl:
+        reasons.append(f"{len(tbl)} table(s) cite results that are not committed: "
+                       + ", ".join(sorted({f"{i['section']}/{i['caption']}" for i in tbl})))
     limit = (await _rule(db, project, "abstract.word_limit"))
     if limit is not None and (limit.value or "").isdigit() and word_count(section_text(content.section("abstract"))) > int(limit.value):
         reasons.append(f"abstract exceeds {limit.value} words")
