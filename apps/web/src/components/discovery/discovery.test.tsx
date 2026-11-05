@@ -32,6 +32,7 @@ describe("template status mapping", () => {
     const run = (status: string): CompileRunEntry => ({
         id: "r", kind: "sample", options: {}, status, pages: 1, checks: [], errors: [], freshness: "current", created_at: "",
         pdf_artifact_id: null, report_artifact_id: null, log_artifact_id: null, source_bundle_artifact_id: null, manuscript_version_id: null,
+        execution: null,
     });
 
     it("labels unsupported templates as not submission-ready", () => {

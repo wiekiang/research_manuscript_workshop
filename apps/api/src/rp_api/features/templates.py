@@ -114,7 +114,8 @@ def template_out(t: Template, files: list[TemplateFile] | None = None, runs: lis
 
 def compile_run_out(r: CompileRun) -> dict:
     return {"id": str(r.id), "kind": r.kind, "options": r.options, "status": r.status, "pages": r.pages,
-            "checks": r.checks, "errors": r.errors, "freshness": r.freshness, "created_at": r.created_at,
+            "checks": r.checks, "errors": r.errors, "execution": r.execution, "freshness": r.freshness,
+            "created_at": r.created_at,
             "pdf_artifact_id": str(r.pdf_artifact_id) if r.pdf_artifact_id else None,
             "report_artifact_id": str(r.report_artifact_id) if r.report_artifact_id else None,
             "log_artifact_id": str(r.log_artifact_id) if r.log_artifact_id else None,
@@ -288,6 +289,7 @@ class CompileRunIn(BaseModel):
     checks: list[dict[str, Any]]
     pages: int | None = None
     errors: list[str] = Field(default_factory=list)
+    execution: dict[str, Any] | None = None
     manuscript_version_id: uuid.UUID | None = None
 
 

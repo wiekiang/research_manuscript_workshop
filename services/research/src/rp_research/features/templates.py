@@ -135,7 +135,7 @@ async def template_sample_compile(task_id: str, project_id: str, template_id: st
                 "report_artifact_id": rep.artifact_id, "pdf_artifact_id": pdf_id, "log_artifact_id": log_id,
                 "source_bundle_artifact_id": bundle_id,
                 "checks": [{"id": c["id"], "status": c["status"], "detail": c["detail"]} for c in report["checks"]],
-                "pages": out.report.pages, "errors": out.report.errors[:20]})
+                "pages": out.report.pages, "execution": out.report.execution().to_dict(), "errors": out.report.errors[:20]})
             if out.report.duration_s:
                 await api.record_usage(category="tex_compile", provider="latex_sandbox", units=out.report.duration_s,
                                        unit="seconds", stage="template_sample")

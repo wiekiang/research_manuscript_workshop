@@ -54,3 +54,5 @@ class ExperimentRun(Base, TenantMixin):
     reproduction: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     result_manifest_id: Mapped[uuid.UUID | None] = mapped_column()
     failure_reason: Mapped[str | None] = mapped_column(Text)
+    # Sandbox execution details (rp_latex.sandbox.ExecutionDetails); same shape as compile_runs.execution.
+    execution: Mapped[dict[str, Any] | None] = mapped_column(JSONB)

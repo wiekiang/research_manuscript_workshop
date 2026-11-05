@@ -17,10 +17,10 @@ from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 
 with workflow.unsafe.imports_passed_through():
-    from rp_contracts.experiments import CENTS_PER_CPU_MINUTE, ExperimentPlanIn, rerun_command
+    from rp_contracts.experiments import CENTS_PER_CPU_MINUTE, ExperimentPlanIn, argv_for, rerun_command
     from rp_contracts.hashing import content_hash
     from rp_contracts.tasks import QUEUE_EXPERIMENT
-    from rp_experiment.runner import execute
+    from rp_experiment.runner import RunOutput, execute
     from rp_experiment.validate import VALIDATOR_VERSION, recompute, reported_metrics
 
     from ..api_client import ApiCallError, ApiClient
@@ -38,6 +38,21 @@ def _zip(files: dict[str, bytes]) -> bytes:
             info.compress_type = zipfile.ZIP_DEFLATED
             z.writestr(info, files[name])
     return buf.getvalue()
+
+
+async def _record_worker_failure(api: ApiClient, project_id: str, run_id: str, plan: ExperimentPlanIn, image_ref: str,
+                                 exc: BaseException) -> None:
+    """The runner raised instead of returning: publish the error as the run log and mark the run failed with the
+    same execution block a sandbox failure would carry, so callers see a diagnosis rather than a run stuck in
+    `running`. The exception is re-raised by the caller so the task is also marked failed."""
+    reason = f"the worker could not execute the run: {type(exc).__name__}: {str(exc)[:1000]}"
+    out = RunOutput("failed", None, None, reason, argv=argv_for(plan), image=image_ref, failure_reason=reason)
+    imh = content_hash({"run": run_id})
+    log = await api.publish(project_id, "experiment_log", reason.encode(), "text/plain", imh, slot=f"{run_id}:log",
+                            label=f"Run log {run_id[:8]}")
+    await api.post(f"/v1/internal/experiment-runs/{run_id}/status", {
+        "status": "failed", "exit_code": None, "duration_s": None, "log_artifact_id": log.artifact_id,
+        "failure_reason": reason, "execution": out.execution().to_dict()})
 
 
 @activity.defn
@@ -68,7 +83,11 @@ async def experiment_execute(task_id: str, project_id: str, run_id: str) -> dict
                 return {"status": "failed", "problems": problems}
             await api.post(f"/v1/internal/experiment-runs/{run_id}/status", {"status": "running"})
             started = datetime.now(UTC)
-            out = execute(plan, s["image_ref"], code, inputs)
+            try:
+                out = execute(plan, s["image_ref"], code, inputs)
+            except Exception as exc:  # noqa: BLE001 - the run must never stay "running" without a diagnosis
+                await _record_worker_failure(api, project_id, run_id, plan, s["image_ref"], exc)
+                raise
             finished = datetime.now(UTC)
             imh = content_hash({"run": run_id})
             log = await api.publish(project_id, "experiment_log", out.log.encode(), "text/plain", imh, slot=f"{run_id}:log",
@@ -99,19 +118,21 @@ async def experiment_execute(task_id: str, project_id: str, run_id: str) -> dict
                 "reported_metrics": metrics, "rerun_of": (s.get("rerun_of") or {}).get("run_id"),
                 "rerun_command": rerun_command(s["plan_id"]),
             }
+            reason = None
+            if status != "succeeded":
+                reason = metrics_problem or out.failure_reason or f"the program exited with code {out.exit_code}"
+            # `execution` is the sandbox's view (status, exit code, streams, sandbox-level reason); the manifest's
+            # own status/failure_reason are the run's outcome, which also covers unusable metrics after exit 0.
+            manifest["failure_reason"] = reason
+            manifest["execution"] = out.execution().to_dict()
             rm = await api.publish_json(project_id, "run_manifest", manifest, imh, slot=f"{run_id}:manifest",
                                         depends_on=[s["plan_artifact_id"], log.artifact_id] + ([raw.artifact_id] if raw else []),
                                         label=f"Run manifest {run_id[:8]} ({status})")
-            reason = None
-            if status != "succeeded":
-                reason = metrics_problem or {"timed_out": "the run exceeded its time limit",
-                                             "sandbox_unavailable": "the sandbox was unavailable (fail closed)"}.get(
-                    out.status, f"the program exited with code {out.exit_code}")
             await api.post(f"/v1/internal/experiment-runs/{run_id}/status", {
                 "status": status, "exit_code": out.exit_code, "duration_s": out.duration_s,
                 "run_manifest_artifact_id": rm.artifact_id, "raw_output_artifact_id": raw.artifact_id if raw else None,
                 "predictions_artifact_id": pred.artifact_id if pred else None, "log_artifact_id": log.artifact_id,
-                "reported_metrics": metrics, "failure_reason": reason})
+                "reported_metrics": metrics, "failure_reason": reason, "execution": manifest["execution"]})
             if out.duration_s:
                 await api.record_usage(category="compute", provider="experiment_sandbox",
                                        units=out.duration_s * plan.limits.cpus, unit="cpu_seconds", stage="experiment_run",

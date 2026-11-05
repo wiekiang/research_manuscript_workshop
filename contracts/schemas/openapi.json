@@ -948,6 +948,18 @@
             "title": "Errors",
             "type": "array"
           },
+          "execution": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution"
+          },
           "kind": {
             "pattern": "^(sample|manuscript|package)$",
             "title": "Kind",
@@ -4187,6 +4199,18 @@
             ],
             "title": "Duration S"
           },
+          "execution": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution"
+          },
           "exit_code": {
             "anyOf": [
               {
@@ -6241,8 +6265,8 @@
     }
   },
   "info": {
-    "description": "Canonical API for the Autonomous AI Research and Manuscript Generation Platform. All public paths are relative to /v1.",
-    "title": "Research Platform API",
+    "description": "Canonical API for Research Manuscript Workspace. All public paths are relative to /v1.",
+    "title": "Research Manuscript Workspace API",
     "version": "1.0.0"
   },
   "openapi": "3.1.0",

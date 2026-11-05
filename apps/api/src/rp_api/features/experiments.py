@@ -62,6 +62,7 @@ def run_out(r: ExperimentRun) -> dict:
     return {"id": str(r.id), "status": r.status, "rerun_of": s(r.rerun_of), "task_id": str(r.task_id),
             "exit_code": r.exit_code, "duration_s": r.duration_s, "reported_metrics": r.reported_metrics,
             "recomputation": r.recomputation, "reproduction": r.reproduction, "failure_reason": r.failure_reason,
+            "execution": r.execution,
             "run_manifest_artifact_id": s(r.run_manifest_artifact_id), "raw_output_artifact_id": s(r.raw_output_artifact_id),
             "predictions_artifact_id": s(r.predictions_artifact_id), "log_artifact_id": s(r.log_artifact_id),
             "recomputation_artifact_id": s(r.recomputation_artifact_id), "result_manifest_id": s(r.result_manifest_id),
@@ -306,6 +307,7 @@ class RunResultIn(BaseModel):
     log_artifact_id: uuid.UUID | None = None
     reported_metrics: dict[str, float] | None = None
     failure_reason: str | None = None
+    execution: dict[str, Any] | None = None
 
 
 @router.post("/internal/experiment-runs/{run_id}/status")

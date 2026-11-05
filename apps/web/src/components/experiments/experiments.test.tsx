@@ -19,6 +19,7 @@ const run = (over: Partial<ExperimentRunEntry> = {}): ExperimentRunEntry => ({
     recomputation: { status: "passed", validator: "rp-experiment-validator/1", detail: "every planned metric was recomputed from the raw predictions", checks: [{ id: "recompute:accuracy[None]", status: "passed", detail: "recomputed 0.7500 vs reported 0.7500 (tolerance 0.001)" }] },
     reproduction: null,
     failure_reason: null,
+    execution: null,
     run_manifest_artifact_id: "m1",
     raw_output_artifact_id: "o1",
     predictions_artifact_id: "p1",

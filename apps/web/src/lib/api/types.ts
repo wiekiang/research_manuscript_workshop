@@ -490,6 +490,29 @@ export interface CompileCheck {
     detail: string;
 }
 
+/** Bounded tail of one sandbox output stream. */
+export interface StreamTail {
+    text: string;
+    total_bytes: number;
+    truncated: boolean;
+}
+
+/** Sandbox execution details; identical shape on compile runs and experiment runs. */
+export interface ExecutionDetails {
+    status: string;
+    exit_code: number | null;
+    timed_out: boolean;
+    duration_s: number | null;
+    image: string | null;
+    argv: string[];
+    stdout: StreamTail;
+    stderr: StreamTail;
+    failure_reason: string | null;
+    output_error: string | null;
+    /** Whether the sandbox stream files came back; absent on records written before the field existed. */
+    streams_collected?: boolean;
+}
+
 export interface CompileRunEntry {
     id: string;
     kind: string;
@@ -498,6 +521,7 @@ export interface CompileRunEntry {
     pages: number | null;
     checks: CompileCheck[];
     errors: string[];
+    execution: ExecutionDetails | null;
     freshness: string;
     created_at: string;
     pdf_artifact_id: string | null;
@@ -1484,6 +1508,7 @@ export interface ExperimentRunEntry {
     recomputation: Recomputation | null;
     reproduction: Reproduction | null;
     failure_reason: string | null;
+    execution: ExecutionDetails | null;
     run_manifest_artifact_id: string | null;
     raw_output_artifact_id: string | null;
     predictions_artifact_id: string | null;

@@ -3946,6 +3946,10 @@ export interface components {
             }[];
             /** Errors */
             errors?: string[];
+            /** Execution */
+            execution?: {
+                [key: string]: unknown;
+            } | null;
             /** Kind */
             kind: string;
             /** Log Artifact Id */
@@ -5073,6 +5077,10 @@ export interface components {
         RunResultIn: {
             /** Duration S */
             duration_s?: number | null;
+            /** Execution */
+            execution?: {
+                [key: string]: unknown;
+            } | null;
             /** Exit Code */
             exit_code?: number | null;
             /** Failure Reason */

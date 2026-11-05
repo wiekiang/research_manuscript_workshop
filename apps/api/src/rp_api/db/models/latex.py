@@ -68,4 +68,7 @@ class CompileRun(Base, TenantMixin):
     checks: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
     pages: Mapped[int | None] = mapped_column()
     errors: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
+    # Sandbox execution details (rp_latex.sandbox.ExecutionDetails): status, exit_code, timed_out, duration_s,
+    # image, argv, stdout/stderr tails, failure_reason, output_error. Same shape as experiment_runs.execution.
+    execution: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     freshness: Mapped[str] = mapped_column(String(10), default="current")

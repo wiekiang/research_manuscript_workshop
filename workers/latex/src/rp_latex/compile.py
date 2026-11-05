@@ -11,7 +11,7 @@ from typing import Any
 from rp_contracts.latexdoc import ManuscriptDocument, RenderOptions
 
 from .adapters import ADAPTER_VERSION, AdapterError, render
-from .sandbox import DockerSandbox, Limits, SandboxUnavailable
+from .sandbox import DockerSandbox, ExecutionDetails, Limits, SandboxUnavailable, StreamTail
 
 COMPILER_VERSION = "rp-latex-compile/1"
 ENV = {"TEXINPUTS": ".//:", "BSTINPUTS": ".//:", "BIBINPUTS": ".//:", "TEXMFVAR": "/tmp/texmf-var",  # noqa: S108 - container-private tmpfs
@@ -48,11 +48,24 @@ class CompileReport:
     generated_files: dict[str, str] = field(default_factory=dict)
     pdf_metadata: dict[str, Any] = field(default_factory=dict)
     log_excerpt: str = ""
+    stdout: StreamTail = field(default_factory=StreamTail)  # bounded tail of the sandboxed toolchain's stdout
+    stderr: StreamTail = field(default_factory=StreamTail)  # same shape; includes runtime diagnostics
+    argv: list[str] = field(default_factory=list)  # redacted sandbox argv (isolation flags, image, placeholder script)
+    failure_reason: str | None = None  # None only when status == compiled
+    output_error: str | None = None
+    streams_collected: bool = False
     adapter_version: str = ADAPTER_VERSION
     compiler_version: str = COMPILER_VERSION
 
+    def execution(self) -> ExecutionDetails:
+        return ExecutionDetails(status=self.status, exit_code=self.exit_code, timed_out=self.timed_out,
+                                duration_s=self.duration_s, image=self.image, argv=list(self.argv), stdout=self.stdout,
+                                stderr=self.stderr, failure_reason=self.failure_reason, output_error=self.output_error,
+                                streams_collected=self.streams_collected)
+
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
+        d["execution"] = self.execution().to_dict()
         return d
 
     def check(self, cid: str) -> Check | None:
@@ -135,6 +148,7 @@ def compile_document(
     except AdapterError as exc:
         report.status = "unsupported"
         report.errors = [str(exc)]
+        report.failure_reason = str(exc)
         report.checks.append(Check("template.supported", "failed", str(exc)))
         return CompileOutput(report, None, "", {})
     overlap = set(generated) & set(template_files)
@@ -157,18 +171,47 @@ def compile_document(
         res = sandbox.run(files, steps, collect=["main.pdf", "main.log", "main.blg", "_latexmk.rc", "_protected.sha256",
                                                  "_generated.sha256", "_generate.log"], env=ENV)
     except SandboxUnavailable as exc:
+        # Nothing ran: no exit code, no duration, no argv, empty tails. The image is known and recorded; the
+        # probe's diagnosis is the reason, the only error, the check detail and the whole log.
         report.status = "sandbox_unavailable"
+        report.image = getattr(sandbox, "image", None)
         report.errors = [str(exc)]
+        report.failure_reason = str(exc)
+        report.log_excerpt = str(exc)
         report.checks.append(Check("compile.success", "not_performed", str(exc)))
-        return CompileOutput(report, None, "", {k: v.encode() for k, v in generated.items()})
+        return CompileOutput(report, None, str(exc), {k: v.encode() for k, v in generated.items()})
     out = res.files
-    report.exit_code = int((out.get("_latexmk.rc") or b"1").decode().strip() or 1) if not res.timed_out else 124
+    # latexmk's own exit status is written to _latexmk.rc inside the sandbox (the sandbox exit code stays 0 so
+    # the protected-file hashes are still collected). When that file is missing latexmk never reported, so the
+    # sandbox's exit status is the truth: 124 on timeout, a docker CLI code when the container never started,
+    # or the status of a step that failed earlier in the chain.
+    latexmk_rc = _parse_rc(out.get("_latexmk.rc"))
+    report.exit_code = res.exit_code if latexmk_rc is None else latexmk_rc
     report.timed_out = res.timed_out
     report.duration_s = res.duration_s
     report.image = res.image
+    report.argv = list(res.argv)
+    report.output_error = res.output_error
+    report.streams_collected = res.streams_collected
+    report.stdout, report.stderr = res.stdout, res.stderr
     log = (out.get("main.log") or b"").decode("utf-8", "replace")
     parse_log(log + "\n" + (out.get("main.blg") or b"").decode("utf-8", "replace"), report)
+    if not log.strip():
+        # main.log never came back (timeout, runtime failure, unreadable archive): the stream tails are the only
+        # record of what the toolchain did, so they become the log and the excerpt instead of an empty string.
+        log = stream_diagnostics(res)
     report.log_excerpt = "\n".join(log.splitlines()[-60:])
+    diag = [ln for ln in res.stderr.text.strip().splitlines() if ln.strip()]
+    if res.timed_out:
+        limit = getattr(getattr(sandbox, "limits", None), "timeout_s", None)
+        report.errors.append("compilation timed out" + (f" after {limit}s" if limit else "")
+                             + "; the container was killed before main.log could be collected"
+                             + (f" (last output: {_last_line(res.stdout.text)})" if res.stdout.text.strip() else ""))
+    elif res.output_error:
+        report.errors.append(f"sandbox outputs could not be read: {res.output_error}")
+    elif latexmk_rc is None:
+        report.errors.append(f"the sandbox exited with code {res.exit_code} before latexmk reported a result"
+                             + (": " + " | ".join(diag[-3:]) if diag else ""))
     if requires_generation and not any(k.endswith(".cls") for k in (out.get("_generated.sha256") or b"").decode().split()):
         report.errors.append("class generation from the official .dtx failed: "
                              + (out.get("_generate.log") or b"").decode("utf-8", "replace")[-500:])
@@ -189,11 +232,22 @@ def compile_document(
         if len(parts) == 2 and parts[1].strip() not in protected:
             report.generated_files[parts[1].strip()] = parts[0]
     pdf = out.get("main.pdf")
-    ok = report.exit_code == 0 and pdf is not None and not res.timed_out
+    ok = report.exit_code == 0 and pdf is not None and not res.timed_out and res.output_error is None
     report.status = "compiled" if ok else "failed"
-    report.checks.append(Check("compile.success", "passed" if ok else "failed",
-                               "PDF produced" if ok else ("timed out" if res.timed_out else "compilation failed"),
-                               {"errors": report.errors[:5]}))
+    if ok:
+        detail = "PDF produced"
+    elif res.timed_out:
+        detail = "timed out"
+    elif res.output_error:
+        detail = "sandbox outputs could not be read"
+    elif latexmk_rc is None:
+        detail = "the sandbox failed before compilation ran"
+    else:
+        detail = "compilation failed"
+    report.checks.append(Check("compile.success", "passed" if ok else "failed", detail, {"errors": report.errors[:5]}))
+    if not ok:  # the timeout error line already says "timed out", so it is the reason by itself
+        report.failure_reason = report.errors[0] if res.timed_out and report.errors else \
+            detail + (f": {report.errors[0]}" if report.errors else "")
     report.checks.append(Check("template.protected_unchanged", "passed" if unchanged and protected else
                                ("not_performed" if not protected else "failed"),
                                "protected style/class/bibliography files are byte-identical after compilation"
@@ -251,6 +305,39 @@ def compile_document(
                                        "self-citation phrasing and images may still identify authors; a human must check"))
     return CompileOutput(report, pdf, log, {k: v.encode() for k, v in generated.items()})
 
+
+def _last_line(text: str) -> str:
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    return lines[-1][:200] if lines else ""
+
+
+def stream_diagnostics(res: Any) -> str:
+    """A readable log built from the sandbox's stdout/stderr tails, used when main.log is unavailable."""
+    parts = []
+    for label, tail in (("stdout", res.stdout), ("stderr", res.stderr)):
+        if not tail.text.strip():
+            continue
+        head = f"--- sandbox {label} tail"
+        if tail.truncated:
+            head += f" (last {len(tail.text.encode())} of {tail.total_bytes} bytes)"
+        parts.append(head + " ---\n" + tail.text.strip("\n") + "\n")
+    if res.timed_out:
+        parts.insert(0, "main.log was not collected: the compile timed out and the container was killed.\n")
+    elif res.output_error:
+        parts.insert(0, f"main.log was not collected: {res.output_error}.\n")
+    elif not parts:
+        parts.append(f"main.log was not produced and the sandbox printed nothing (exit code {res.exit_code}).\n")
+    return "\n".join(parts)
+
+
+def _parse_rc(raw: bytes | None) -> int | None:
+    if raw is None:
+        return None
+    try:
+        return int(raw.decode("utf-8", "replace").strip())
+    except ValueError:
+        return 1  # the step ran but wrote something unexpected: still a failure
+    
 
 def sample_figure_pdf() -> bytes:
     """A tiny valid one-page PDF with a drawn rectangle, used as the sample figure."""
