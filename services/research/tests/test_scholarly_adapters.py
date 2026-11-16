@@ -72,19 +72,106 @@ async def test_identity_verdicts(transport):
     assert missing == "not_found" and "fabricated" in ev["reason"]
 
 
-@pytest.mark.parametrize("status,kind,retryable", [(401, "access_denied", False), (403, "access_denied", False),
-                                                   (402, "payment_required", False), (429, "rate_limited", True),
-                                                   (503, "unavailable", True)])
-async def test_http_failures_are_classified(status, kind, retryable):
-    adapter_base.use_transport(httpx.MockTransport(lambda r: httpx.Response(status, headers={"retry-after": "7"})))
-    try:
-        with pytest.raises(ProviderError) as exc:
-            await CrossrefAdapter().search("x", {}, 5)
-        assert exc.value.kind == kind and exc.value.retryable == retryable
-        if status == 429:
-            assert exc.value.retry_after == 7
-    finally:
-        adapter_base.use_transport(None)
+@pytest.fixture
+def no_sleep(monkeypatch):
+    waits: list[float] = []
+
+    async def fake(seconds):
+        waits.append(seconds)
+
+    monkeypatch.setattr(adapter_base, "_sleep", fake)
+    return waits
+
+
+def scripted(*responses: httpx.Response):
+    """Serve the given responses in order (the last repeats) and count requests."""
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(str(request.url))
+        return responses[min(len(calls), len(responses)) - 1]
+
+    adapter_base.use_transport(httpx.MockTransport(handler))
+    return calls
+
+
+@pytest.fixture
+def reset_transport():
+    yield
+    adapter_base.use_transport(None)
+
+
+ADAPTERS = [CrossrefAdapter, OpenAireAdapter]
+OK_BODY = {"crossref": json.loads((FIX / "crossref_search.json").read_text()),
+           "openaire": json.loads((FIX / "openaire_search.json").read_text())}
+
+
+@pytest.mark.parametrize("cls", ADAPTERS)
+@pytest.mark.parametrize("status", [429, 500, 503])
+async def test_transient_failures_are_retried_then_succeed(cls, status, no_sleep, reset_transport):
+    ad = cls()
+    calls = scripted(httpx.Response(status, headers={"retry-after": "7"}), httpx.Response(200, json=OK_BODY[ad.name]))
+    page = await ad.search("x", {}, 5)
+    assert len(calls) == 2 and page.records
+    assert no_sleep == ([7] if status == 429 else [1])
+
+
+@pytest.mark.parametrize("cls", ADAPTERS)
+@pytest.mark.parametrize("status,kind", [(429, "rate_limited"), (503, "unavailable")])
+async def test_transient_failures_exhaust_retries(cls, status, kind, no_sleep, reset_transport):
+    ad = cls()
+    calls = scripted(httpx.Response(status, headers={"retry-after": "7"}))
+    with pytest.raises(ProviderError) as exc:
+        await ad.search("x", {}, 5)
+    assert len(calls) == adapter_base.MAX_ATTEMPTS
+    assert exc.value.provider == ad.name and exc.value.kind == kind and exc.value.retryable
+    assert exc.value.status == status and str(exc.value).startswith(f"{ad.name}: ")
+    if status == 429:
+        assert exc.value.retry_after == 7
+
+
+async def test_long_retry_after_is_surfaced_without_waiting(no_sleep, reset_transport):
+    calls = scripted(httpx.Response(429, headers={"retry-after": "3600"}))
+    with pytest.raises(ProviderError) as exc:
+        await CrossrefAdapter().search("x", {}, 5)
+    assert len(calls) == 1 and no_sleep == []
+    assert exc.value.kind == "rate_limited" and exc.value.retry_after == 3600
+
+
+@pytest.mark.parametrize("cls", ADAPTERS)
+@pytest.mark.parametrize("status,kind", [(401, "access_denied"), (402, "payment_required"), (403, "access_denied")])
+async def test_auth_and_payment_failures_stop_the_adapter(cls, status, kind, no_sleep, reset_transport):
+    ad = cls()
+    calls = scripted(httpx.Response(status), httpx.Response(200, json=OK_BODY[ad.name]))
+    with pytest.raises(ProviderError) as first:
+        await ad.search("x", {}, 5)
+    assert first.value.provider == ad.name and first.value.kind == kind and first.value.status == status
+    assert not first.value.retryable and len(calls) == 1 and no_sleep == []
+    with pytest.raises(ProviderError) as again:
+        await ad.lookup_identifier("10.14778/3415478.3415556")
+    assert again.value.kind == kind and again.value.provider == ad.name
+    assert len(calls) == 1  # stopped: the provider is not contacted again
+
+
+@pytest.mark.parametrize("cls", ADAPTERS)
+@pytest.mark.parametrize("status", [400, 405, 410, 422, 301])
+async def test_other_http_failures_are_provider_errors(cls, status, no_sleep, reset_transport):
+    ad = cls()
+    calls = scripted(httpx.Response(status, json={"message": {"items": []}, "header": {}}))
+    with pytest.raises(ProviderError) as exc:
+        await ad.search("x", {}, 5)
+    assert exc.value.provider == ad.name and exc.value.kind == "http_error" and exc.value.status == status
+    assert not exc.value.retryable and len(calls) == 1 and no_sleep == []
+    assert ad._stopped is None  # one bad request does not disable the adapter
+
+
+@pytest.mark.parametrize("cls", ADAPTERS)
+async def test_malformed_lookup_body_is_a_provider_error(cls, reset_transport):
+    ad = cls()
+    scripted(httpx.Response(200, text="<html>not json</html>"))
+    with pytest.raises(ProviderError) as exc:
+        await ad.lookup_identifier("10.14778/3415478.3415556")
+    assert exc.value.provider == ad.name and exc.value.kind == "bad_response"
 
 
 async def test_partial_response_is_flagged():

@@ -1,4 +1,4 @@
-"""rp-api command line: serve | migrate | relay | reconcile | export-contracts."""
+"""rp-api command line: serve | migrate | relay | reconcile | export-contracts | backfill-fulltext-kinds."""
 
 from __future__ import annotations
 
@@ -27,6 +27,8 @@ def main() -> None:
     sub.add_parser("reconcile", help="run the artifact reconciler once")
     exp = sub.add_parser("export-contracts", help="write OpenAPI + JSON Schemas into contracts/")
     exp.add_argument("--out", default=None)
+    sub.add_parser("backfill-fulltext-kinds",
+                   help="label stored full-text locations and fix located/none statuses (repeatable)")
     args = parser.parse_args()
 
     if args.cmd == "serve":
@@ -47,3 +49,7 @@ def main() -> None:
         from .contracts_export import export
 
         export(args.out)
+    elif args.cmd == "backfill-fulltext-kinds":
+        from .services.backfills import backfill_fulltext_location_kinds
+
+        print(json.dumps(asyncio.run(backfill_fulltext_location_kinds()).as_dict(), indent=2))

@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import re
 from enum import StrEnum
+from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic import BaseModel, Field
 
@@ -18,8 +20,38 @@ class Capability(StrEnum):
     REPORT_QUOTA = "report_quota"
 
 
+LocationKind = Literal["file", "landing_page", "publisher_link"]
+
+FILE_CONTENT_TYPES = ("application/pdf", "application/xml", "text/xml", "application/jats+xml", "text/plain")
+_FILE_PATH_PATTERNS = (re.compile(r"\.(pdf|xml|txt)$"), re.compile(r"^/pdf/"), re.compile(r"/content/pdf/"),
+                       re.compile(r"/doi/pdf/"), re.compile(r"/files/[^/]+$"))
+
+
+def classify_location(url: str, content_type: str | None = None) -> LocationKind:
+    """Shared rule for what a full-text link points at. Only links that look like a downloadable file are
+    ``file``; DOI resolvers, handles, repository records and anything unrecognised are ``landing_page``."""
+    ct = (content_type or "").split(";")[0].strip().lower()
+    if ct in FILE_CONTENT_TYPES:
+        return "file"
+    parts = urlsplit(url or "")
+    host, path = (parts.hostname or "").lower(), parts.path.lower()
+    if host in ("doi.org", "dx.doi.org", "hdl.handle.net", "dblp.org"):
+        return "landing_page"
+    if host.endswith("arxiv.org"):
+        return "file" if path.startswith("/pdf/") else "landing_page"
+    if any(p.search(path) for p in _FILE_PATH_PATTERNS):
+        return "file"
+    return "landing_page"
+
+
+def location_kind(loc: dict) -> LocationKind:
+    """Kind of a stored location; unlabelled (legacy) entries are classified by the shared rule."""
+    return loc.get("kind") or classify_location(loc.get("url", ""), loc.get("content_type"))
+
+
 class FullTextLocation(BaseModel):
     url: str
+    kind: LocationKind = "landing_page"  # safe default: an unlabelled link is never treated as full text
     license: str | None = None
     access: str | None = None  # open | restricted | embargoed | closed | unknown
     content_type: str | None = None

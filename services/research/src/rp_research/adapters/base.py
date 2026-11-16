@@ -21,7 +21,7 @@ class ProviderError(Exception):
     def __init__(self, provider: str, kind: str, message: str, status: int | None = None, retry_after: int | None = None):
         super().__init__(f"{provider}: {kind}: {message}")
         self.provider = provider
-        self.kind = kind  # rate_limited | unavailable | access_denied | payment_required | not_found | bad_response
+        self.kind = kind  # rate_limited | unavailable | access_denied | payment_required | not_found | http_error | bad_response
         self.status = status
         self.retry_after = retry_after
 
@@ -59,6 +59,10 @@ class Quota:
 
 _transport: httpx.AsyncBaseTransport | None = None
 
+MAX_ATTEMPTS = 3
+MAX_RETRY_WAIT = 30  # longer Retry-After values are surfaced as rate_limited for the workflow to back off
+_sleep = asyncio.sleep  # patched in tests
+
 
 def use_transport(t: httpx.AsyncBaseTransport | None) -> None:
     """Tests inject recorded fixtures through an httpx transport."""
@@ -69,6 +73,7 @@ def use_transport(t: httpx.AsyncBaseTransport | None) -> None:
 class Adapter:
     name = "base"
     capabilities: dict[Capability, bool] = {}
+    _stopped: ProviderError | None = None  # set after 401/402/403; later calls fail fast without contacting the provider
 
     def supports(self, cap: Capability) -> bool:
         return self.capabilities.get(cap, False)
@@ -78,33 +83,45 @@ class Adapter:
             raise Unsupported(self.name, cap)
 
     async def _get(self, url: str, params: dict | None = None, headers: dict | None = None) -> httpx.Response:
+        """GET with the documented failure policy: retry 429/5xx/timeouts (honouring Retry-After up to a cap), stop
+        the adapter after 401/402/403, and report any other non-2xx status as a provider error so callers fall back."""
+        if self._stopped is not None:
+            raise self._stopped
         async with httpx.AsyncClient(transport=_transport, timeout=30.0, headers={"User-Agent": USER_AGENT,
                                                                                 **(headers or {})}) as c:
-            for attempt in range(3):
+            for attempt in range(MAX_ATTEMPTS):
+                last = attempt == MAX_ATTEMPTS - 1
                 try:
                     r = await c.get(url, params=params)
                 except httpx.TimeoutException as exc:
-                    if attempt == 2:
+                    if last:
                         raise ProviderError(self.name, "unavailable", "timeout") from exc
-                    await asyncio.sleep(1 + attempt)
+                    await _sleep(1 + attempt)
                     continue
                 except httpx.HTTPError as exc:
                     raise ProviderError(self.name, "unavailable", str(exc)) from exc
-                if r.status_code == 429:
-                    ra = r.headers.get("retry-after")
-                    raise ProviderError(self.name, "rate_limited", "rate limited", 429, int(ra) if ra and ra.isdigit() else 30)
-                if r.status_code in (401, 403):
-                    raise ProviderError(self.name, "access_denied", f"HTTP {r.status_code}", r.status_code)
-                if r.status_code == 402:
-                    raise ProviderError(self.name, "payment_required", "HTTP 402", 402)
-                if r.status_code == 404:
-                    raise ProviderError(self.name, "not_found", "not found", 404)
-                if r.status_code >= 500:
-                    if attempt == 2:
-                        raise ProviderError(self.name, "unavailable", f"HTTP {r.status_code}", r.status_code)
-                    await asyncio.sleep(1 + attempt)
+                code = r.status_code
+                if 200 <= code < 300:
+                    return r
+                if code in (401, 402, 403):
+                    kind = "payment_required" if code == 402 else "access_denied"
+                    self._stopped = ProviderError(self.name, kind, f"HTTP {code}; adapter stopped", code)
+                    raise self._stopped
+                if code == 429:
+                    ra = r.headers.get("retry-after", "")
+                    wait = int(ra) if ra.isdigit() else 30
+                    if last or wait > MAX_RETRY_WAIT:
+                        raise ProviderError(self.name, "rate_limited", "rate limited", 429, wait)
+                    await _sleep(wait)
                     continue
-                return r
+                if code >= 500:
+                    if last:
+                        raise ProviderError(self.name, "unavailable", f"HTTP {code}", code)
+                    await _sleep(1 + attempt)
+                    continue
+                if code == 404:
+                    raise ProviderError(self.name, "not_found", "not found", 404)
+                raise ProviderError(self.name, "http_error", f"HTTP {code}", code)
         raise ProviderError(self.name, "unavailable", "exhausted retries")
 
     async def search(self, query: str, filters: dict, limit: int, cursor: str | None = None) -> SearchPage:

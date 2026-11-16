@@ -665,6 +665,12 @@ async def reassess(project_id: uuid.UUID, ctx: Ctx = Depends(user_ctx)):
 
 
 # --------------------------------------------------------------------------- internal (workers)
+def located_status(locations: list[dict] | None) -> str:
+    """``located`` only when a location is explicitly labelled a downloadable file (FullTextLocation.kind).
+    Landing pages, publisher links and unlabelled legacy entries do not claim that full text is available."""
+    return "located" if any((loc or {}).get("kind") == "file" for loc in locations or []) else "none"
+
+
 class RecordIn(BaseModel):
     provider: str
     rank: int
@@ -715,7 +721,7 @@ async def ingest_results(project_id: uuid.UUID, run_id: uuid.UUID, body: Results
                                   abstract=rec.get("abstract"), abstract_rights=rec.get("abstract_rights") or "unknown",
                                   license=rec.get("license"), open_access=rec.get("open_access"),
                                   fulltext_locations=rec.get("fulltext") or [],
-                                  fulltext_status="located" if rec.get("fulltext") else "none", rights=r.model_dump(),
+                                  fulltext_status=located_status(rec.get("fulltext")), rights=r.model_dump(),
                                   sources=[item.provider], origin="search", added_by=ctx.principal.actor_id,
                                   embedding=embed(f"{rec.get('title') or ''} {rec.get('abstract') or ''}"),
                                   embedding_model=EMBEDDING_MODEL)
@@ -728,6 +734,8 @@ async def ingest_results(project_id: uuid.UUID, run_id: uuid.UUID, body: Results
             p.abstract = p.abstract or rec.get("abstract")
             known = {loc["url"] for loc in p.fulltext_locations or []}
             p.fulltext_locations = (p.fulltext_locations or []) + [loc for loc in rec.get("fulltext") or [] if loc["url"] not in known]
+            if p.fulltext_status in ("none", "located"):  # never overwrite a verdict from the fetch step
+                p.fulltext_status = located_status(p.fulltext_locations)
             if p.license is None and rec.get("license"):
                 p.license = rec.get("license")
                 p.rights = rights_for(p.license, p.open_access).model_dump()

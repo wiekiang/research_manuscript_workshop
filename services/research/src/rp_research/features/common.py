@@ -8,6 +8,7 @@ from temporalio.exceptions import ApplicationError
 
 from rp_contracts.netpolicy import FetchBlocked
 
+from ..adapters.base import ProviderError as ScholarlyProviderError
 from ..api_client import ApiCallError
 from ..fetch.fetcher import FetchFailed
 from ..gateway import GatewayError
@@ -25,6 +26,10 @@ def app_error(exc: Exception) -> ApplicationError:
     if isinstance(exc, FetchFailed):
         return ApplicationError(f"fetch failed: {exc.reason} (status {exc.status})", {"url": exc.url},
                                 type="fetch_failed", non_retryable=not exc.retryable,
+                                next_retry_delay=timedelta(seconds=exc.retry_after) if exc.retry_after else None)
+    if isinstance(exc, ScholarlyProviderError):
+        return ApplicationError(str(exc), {"provider": exc.provider, "kind": exc.kind, "status": exc.status},
+                                type=exc.kind, non_retryable=not exc.retryable,
                                 next_retry_delay=timedelta(seconds=exc.retry_after) if exc.retry_after else None)
     if isinstance(exc, (GatewayError, ProviderError)):
         code = getattr(exc, "code", "model_error")

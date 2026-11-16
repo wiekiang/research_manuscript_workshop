@@ -11,7 +11,7 @@ from temporalio.common import RetryPolicy
 
 with workflow.unsafe.imports_passed_through():
     from rp_contracts.hashing import content_hash, sha256_hex
-    from rp_contracts.literature import PaperRecord, normalize_doi, rights_for
+    from rp_contracts.literature import PaperRecord, location_kind, normalize_doi, rights_for
     from rp_contracts.netpolicy import FetchBlocked
     from rp_contracts.scanning import scan
     from rp_contracts.tasks import QUEUE_FETCH, QUEUE_RESEARCH
@@ -113,27 +113,56 @@ def identity_verdict(claimed: dict, found: PaperRecord | None) -> tuple[str, dic
     return "mismatch", {**ev, "basis": "the cited title/year do not match the DOI's record"}
 
 
+async def _registry_lookup(doi: str, registries: list) -> tuple[PaperRecord | None, list[ProviderError]]:
+    """Consult DOI registries in order, falling back on a missing record or a provider failure alike.
+
+    Returns the first record found plus every provider failure encountered on the way. A missing record is
+    conclusive (DOI unregistered) only when the error list is empty — otherwise some registry never answered.
+    """
+    errors: list[ProviderError] = []
+    for ad in registries:
+        try:
+            rec = await ad.lookup_identifier(doi)
+        except ProviderError as exc:
+            errors.append(exc)
+            continue
+        if rec is not None:
+            return rec, errors
+    return None, errors
+
+
 @activity.defn
 async def verify_identities(task_id: str, project_id: str, paper_ids: list[str]) -> dict:
-    cr = CrossrefAdapter()
+    registries = [CrossrefAdapter(), DataCiteAdapter()]
     out = {}
+    transient: ProviderError | None = None
     async with ApiClient(task_id) as api:
         for pid in paper_ids:
             p = await api.get(f"/v1/internal/projects/{project_id}/papers/{pid}")
             if not p.get("doi"):
                 continue
-            try:
-                found = await cr.lookup_identifier(p["doi"])
-                if found is None:
-                    found = await DataCiteAdapter().lookup_identifier(p["doi"])
-            except ProviderError as exc:
+            found, errors = await _registry_lookup(p["doi"], registries)
+            err_ev = [{"provider": e.provider, "kind": e.kind, "status": e.status, "error": str(e)} for e in errors]
+            if found is None and errors:
+                # No registry failure may be reported as a not_found (fabricated DOI) verdict.
+                retryable = any(e.retryable for e in errors)
                 await api.post(f"/v1/internal/projects/{project_id}/papers/{pid}/identity",
-                               {"status": "unavailable", "evidence": {"error": str(exc)}})
+                               {"status": "unavailable",
+                                "evidence": {"error": "; ".join(str(e) for e in errors), "provider_errors": err_ev,
+                                             "retryable": retryable}})
                 out[pid] = "unavailable"
+                if transient is None and retryable:
+                    transient = next(e for e in errors if e.retryable)
                 continue
             status, ev = identity_verdict(p, found)
+            if err_ev:
+                ev["provider_errors"] = err_ev
             await api.post(f"/v1/internal/projects/{project_id}/papers/{pid}/identity", {"status": status, "evidence": ev})
             out[pid] = status
+    if transient is not None:
+        # Some verdicts are pending only because a registry was transiently down: retry the activity;
+        # re-posting already-settled verdicts is idempotent.
+        raise app_error(transient) from transient
     return out
 
 
@@ -146,6 +175,7 @@ async def paper_fetch_permitted(task_id: str, project_id: str, paper_id: str) ->
             return {"artifact_id": p["fulltext_artifact_id"], "already": True}
         locations = list(p.get("fulltext_locations") or [])
         license_text, oa = p.get("license"), p.get("open_access")
+        discovery_error: ProviderError | None = None
         if p.get("doi"):
             try:
                 rec = await OpenAireAdapter().locate_full_text(PaperRecord(provider="openaire", external_id="", doi=p["doi"],
@@ -153,16 +183,23 @@ async def paper_fetch_permitted(task_id: str, project_id: str, paper_id: str) ->
                 locations += [loc.model_dump() for loc in rec.fulltext if loc.url not in {x["url"] for x in locations}]
                 license_text = license_text or rec.license
                 oa = oa if oa is not None else rec.open_access
-            except ProviderError:
-                pass
+            except ProviderError as exc:
+                discovery_error = exc
         rights = rights_for(license_text, oa)
+        if discovery_error is not None and discovery_error.retryable and not (locations and rights.storage_permitted):
+            # Transient provider outage with nothing to fall back on: let the activity retry rather than
+            # recording a terminal verdict based on incomplete discovery.
+            raise app_error(discovery_error) from discovery_error
+        discovery_note = f"; full-text discovery failed ({discovery_error})" if discovery_error is not None else ""
         if not rights.storage_permitted:
             await api.post(f"/v1/internal/projects/{project_id}/papers/{paper_id}/fulltext",
-                           {"status": "not_permitted", "detail": rights.basis, "license": license_text,
+                           {"status": "not_permitted", "detail": rights.basis + discovery_note, "license": license_text,
                             "rights": rights.model_dump()})
             return {"status": "not_permitted", "basis": rights.basis}
         last_error = None
-        for loc in locations:
+        # File links first (stable sort keeps provider order within a kind); unlabelled legacy entries are
+        # classified by the shared rule so they are never trusted more than a labelled landing page.
+        for loc in sorted(locations, key=lambda x: location_kind(x) != "file"):
             url = loc["url"]
             try:
                 res = await fetcher().fetch(url, accept_types={"application/pdf", "text/html", "application/xml", "text/xml",
@@ -173,6 +210,10 @@ async def paper_fetch_permitted(task_id: str, project_id: str, paper_id: str) ->
             report = scan(res.content, res.media_type)
             if report.verdict == "rejected" or report.sniffed_type not in ("application/pdf", "text/html", "text/plain", "application/xml"):
                 last_error = f"quarantine rejected {url}"
+                continue
+            if report.sniffed_type == "text/html" and location_kind(loc) != "file":
+                # A landing page or publisher page is not the paper; never store it as full text.
+                last_error = f"landing page, not full text: {url}"
                 continue
             art = await api.publish(project_id, "paper_fulltext", res.content, report.sniffed_type,
                                     sha256_hex(res.content), slot=f"fulltext:{paper_id}",
@@ -185,7 +226,7 @@ async def paper_fetch_permitted(task_id: str, project_id: str, paper_id: str) ->
                             "rights": rights.model_dump(), "detail": f"retrieved from {res.final_url}"})
             return {"artifact_id": art.artifact_id, "media_type": report.sniffed_type}
         await api.post(f"/v1/internal/projects/{project_id}/papers/{paper_id}/fulltext",
-                       {"status": "inaccessible", "detail": last_error or "no full-text location found",
+                       {"status": "inaccessible", "detail": (last_error or "no full-text location found") + discovery_note,
                         "license": license_text, "rights": rights.model_dump()})
         return {"status": "inaccessible"}
 

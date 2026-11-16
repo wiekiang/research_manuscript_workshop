@@ -5,7 +5,13 @@ from __future__ import annotations
 import re
 from html import unescape
 
-from rp_contracts.literature import Capability, FullTextLocation, PaperRecord, normalize_doi
+from rp_contracts.literature import (
+    Capability,
+    FullTextLocation,
+    PaperRecord,
+    classify_location,
+    normalize_doi,
+)
 
 from ..config import get_worker_settings
 from .base import Adapter, Disabled, ProviderError, SearchPage
@@ -33,7 +39,8 @@ class CrossrefAdapter(Adapter):
         lic = it.get("license") or []
         lic_url = lic[0].get("URL") if lic else None
         links = [FullTextLocation(url=lk["URL"], license=lic_url, access="unknown", content_type=lk.get("content-type"),
-                                  source="crossref") for lk in (it.get("link") or [])
+                                  kind="file" if classify_location(lk["URL"], lk.get("content-type")) == "file"
+                                  else "publisher_link", source="crossref") for lk in (it.get("link") or [])
                  if lk.get("intended-application") in ("text-mining", "unspecified") and lk.get("URL")]
         issued = (it.get("issued") or {}).get("date-parts") or [[None]]
         authors = [" ".join(x for x in (a.get("given"), a.get("family")) if x) or a.get("name", "")
@@ -78,7 +85,10 @@ class CrossrefAdapter(Adapter):
             if exc.kind == "not_found":
                 return None
             raise
-        return self._record(r.json()["message"])
+        try:
+            return self._record(r.json()["message"])
+        except (ValueError, KeyError, TypeError) as exc:
+            raise ProviderError(self.name, "bad_response", "unexpected response shape") from exc
 
     async def locate_full_text(self, record: PaperRecord) -> PaperRecord:
         return record  # links come with the metadata; Crossref never supplies full text itself
@@ -100,7 +110,7 @@ class OpenAireAdapter(Adapter):
             access = ((inst.get("accessRight") or {}).get("label") or "").lower() or None
             lic = inst.get("license")
             for u in inst.get("urls") or []:
-                locs.append(FullTextLocation(url=u, license=lic, access="open" if access and "open" in access else access,
+                locs.append(FullTextLocation(url=u, kind=classify_location(u), license=lic, access="open" if access and "open" in access else access,
                                              content_type=inst.get("type"), source="openaire"))
         best = ((r.get("bestAccessRight") or {}).get("label") or "").lower()
         year = None
@@ -139,7 +149,10 @@ class OpenAireAdapter(Adapter):
         if not d:
             return None
         r = await self._get(f"{self.base}/v1/researchProducts", params={"pid": d, "pageSize": 5})
-        res = r.json().get("results") or []
+        try:
+            res = r.json().get("results") or []
+        except (ValueError, AttributeError) as exc:
+            raise ProviderError(self.name, "bad_response", "unexpected response shape") from exc
         return self._record(res[0]) if res else None
 
     async def locate_full_text(self, record: PaperRecord) -> PaperRecord:
@@ -175,7 +188,7 @@ class DataCiteAdapter(Adapter):
                            year=a.get("publicationYear"), venue=a.get("publisher"), publisher=a.get("publisher"),
                            type=(a.get("types") or {}).get("resourceTypeGeneral"),
                            license=rights[0].get("rightsUri") if rights else None, open_access=None,
-                           fulltext=[FullTextLocation(url=a["url"], license=rights[0].get("rightsUri") if rights else None,
+                           fulltext=[FullTextLocation(url=a["url"], kind="landing_page", license=rights[0].get("rightsUri") if rights else None,
                                                       access="unknown", source="datacite")] if a.get("url") else [],
                            metadata_license="CC0 (DataCite metadata)", attribution="Metadata from DataCite")
 
@@ -222,7 +235,7 @@ class CoreAdapter(Adapter):
             authors=self._authors(x), year=x.get("year_published") or x.get("yearPublished"),
             publisher=x.get("publisher"), type=x.get("document_type") or x.get("documentType"),
             abstract=x.get("abstract"), abstract_rights="unknown", license=None, open_access=bool(dl) or None,
-            fulltext=[FullTextLocation(url=dl, source="core", access="open")] if dl else [],
+            fulltext=[FullTextLocation(url=dl, kind="file", source="core", access="open")] if dl else [],
             metadata_license="CORE API terms [VERIFY]", attribution="Data provided by CORE (core.ac.uk)")
 
     async def _search(self, q: str, limit: int, offset: int = 0) -> SearchPage:
